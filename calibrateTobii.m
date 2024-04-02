@@ -12,11 +12,11 @@ if nargin < 2
 end
 if nargin < 1
     eyetracker.type = 'Tobii Pro Fusion'; % which eyetracker
-    eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta-ptb'; % check this
+    eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % check this
 end
 
 % set monitors of stereoscopic setup in mirrored mode
-system("xrandr --output DP-1 --same-as DP-0") % set monitors mirrored 
+system("xrandr --output DP-2 --same-as DP-1") % set monitors mirrored 
 
 scr = max(Screen('Screens'));
 run(fullfile(eyetracker.toolboxfld,'addTittaToPath'));
@@ -39,7 +39,7 @@ try
     PsychImaging('PrepareConfiguration');
     PsychImaging('AddTask','AllViews','FlipHorizontal');
     % ----------------------------
-    [wpnt,winRect] = PsychImaging('OpenWindow', scr, 127, [], [], [], [], 4);
+    [wpnt,~] = PsychImaging('OpenWindow', scr, 127, [], [], [], [], 4);
     Priority(1);
     KbName('UnifyKeyNames');    % for correct operation of the setup/calibration interface, calling this is required
     
@@ -51,8 +51,12 @@ try
     ListenChar(0);
     % shut down
     EThndl.deInit();   
+    sca
+    % set monitors of stereoscopic setup in mirrored mode
+    system("xrandr --output DP-2 --right-of DP-1") % set monitors extended 
 catch me
     sca
     ListenChar(0);
     rethrow(me)
+    system("xrandr --output DP-2 --right-of DP-1") % set monitors extended 
 end

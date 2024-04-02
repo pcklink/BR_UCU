@@ -18,11 +18,18 @@ end
 Debug = true;
 
 % load settings
-monitor = []; eyetracker = [];
-sound = []; keys = [];
-bg = []; fix = []; prestim = []; stim = [];
-trialtime = []; trialtype = [];
-block = []; expt = [];
+monitor = [];
+eyetracker = [];
+sound = [];
+keys = [];
+bg = [];
+fix = [];
+prestim = [];
+stim = [];
+trialtime = [];
+trialtype = [];
+block = [];
+expt = [];
 run(settings_file)
 [RunPath,~,~] = fileparts(mfilename('fullpath'));
 
@@ -100,9 +107,9 @@ try
     if Debug % if in debug mode, only open a 75% screen
         % WindowRect=...
         %     [0 0 .75*monitor.PixWidth .75*monitor.PixHeight]; %debug
-        WindowRect = ...
-            [0 0 1000 500]; %#ok<*UNRCH> %debug
-        %WindowRect = []; %fullscreen
+        % WindowRect = ...
+        %     [1080 0 1080+1920 1080]; %#ok<*UNRCH> %debug
+        WindowRect = []; %fullscreen
     else
         WindowRect = []; %fullscreen
     end
@@ -774,7 +781,7 @@ try
             keys.KeyWasDown = false;
             keys.KeyIsDown = false;
             keys.LastKey = [];
-            %fprintf('Starting stim\n')
+            fprintf('Starting stim\n')
 
             while vbl-StimStarted < trialtime.StimT  && ~StopExp
                 % stim
@@ -822,12 +829,10 @@ try
                                         stim(ss).dotcol = 0.5 + ...
                                             (round(rand(1,stim(ss).nDots)).*stim(ss).contrast) - ...
                                             stim(ss).contrast/2;
-                                        stim(ss).dotcol = [stim(ss).dotcol;stim(ss).dotcol;stim(ss).dotcol];
                                     else
                                         stim(ss).dotcol = 0.5 + ...
                                             (rand(1,stim(ss).nDots).*stim(ss).contrast) - ...
                                             stim(ss).contrast/2;
-                                        stim(ss).dotcol = [stim(ss).dotcol;stim(ss).dotcol;stim(ss).dotcol];
                                     end
                                 end
 
@@ -866,137 +871,135 @@ try
                             % - draw
                             Screen('DrawDots',monitor.w,...
                                 stim(ss).dotfb(fb+1).xy, stim(ss).dotsizepix, ...
-                                stim(ss).dotcol,monitor.center,1);
-                            % Screen('DrawTexture', monitor.w, ....
-                            %     StimMask, [], drect, []);
+                                stim(ss).dotcol,monitor.center,0)
+                            Screen('DrawTexture', monitor.w, ....
+                                StimMask, [], drect, []);
                         case 'image'
                             drect = [0 0 StimSizePix(1) StimSizePix(2)];
-                            drect = CenterRectOnPoint(drect,...
-                                monitor.center(1),monitor.center(2));
                             Screen('DrawTexture', monitor.w,...
                                 stim(ss).imgtex,[],drect);
-                            % switch stim(ss).overlay.type
-                            %     case 'dots'
-                            %         if cF == 0 % - first frame
-                            %             % locations
-                            %             stim(ss).overlay.nDots = round(...
-                            %                 stim(ss).overlay.dotdensity * ...
-                            %                 trialtype(T).stimsize(1) * ...
-                            %                 trialtype(T).stimsize(2));
-                            %             stim(ss).overlay.dotfb(fb+1).xy = [...
-                            %                 round(- StimSizePix(1)/2 + ...
-                            %                 rand(1,stim(ss).overlay.nDots).*StimSizePix(1)); ...
-                            %                 round(- StimSizePix(2)/2 + ...
-                            %                 rand(1,stim(ss).overlay.nDots).*StimSizePix(1))];
-                            %             % colors
-                            %             if ~isempty(stim(ss).overlay.color)
-                            %                 stim(ss).overlay.dotcol = [stim(ss).overlay.color ...
-                            %                     stim(ss).overlay.opacity];
-                            %             else
-                            %                 if stim(ss).overlay.contrastbin
-                            %                     stim(ss).overlay.dotcol = 0.5 + ...
-                            %                         (round(rand(1,stim(ss).overlay.nDots)).*stim(ss).overlay.contrast) - ...
-                            %                         stim(ss).overlay.contrast/2;
-                            %                 else
-                            %                     stim(ss).overlay.dotcol = 0.5 + ...
-                            %                         (rand(1,stim(ss).overlay.nDots).*stim(ss).overlay.contrast) - ...
-                            %                         stim(ss).overlay.contrast/2;
-                            %                 end
-                            %                 stim(ss).overlay.dotcol = [...
-                            %                     stim(ss).overlay.dotcol;...
-                            %                     stim(ss).overlay.dotcol;...
-                            %                     stim(ss).overlay.dotcol;...
-                            %                     stim(ss).overlay.opacity*ones(1,stim(ss).overlay.nDots)];
-                            %             end
-                            % 
-                            %             % dot age
-                            %             stim(ss).overlay.dotage = round(rand(1,stim(ss).overlay.nDots).*...
-                            %                 stim(ss).overlay.dotlifetime);
-                            %         else
-                            %             % - move
-                            %             for a = 1:2
-                            %                 stim(ss).overlay.dotfb(fb+1).xy(a,:) = stim(ss).overlay.dotfb(fb+1).xy(a,:) + ...
-                            %                     stim(ss).overlay.driftpixframe(a);
-                            %                 oof = stim(ss).overlay.dotfb(fb+1).xy(a,:) > ...
-                            %                     round(StimSizePix(a)/2);
-                            %                 stim(ss).overlay.dotfb(fb+1).xy(a,oof) = stim(ss).overlay.dotfb(fb+1).xy(a,oof) - ...
-                            %                     round(StimSizePix(a)/2);
-                            %                 oof = stim(ss).overlay.dotfb(fb+1).xy(a,:) < ...
-                            %                     round(-StimSizePix(a)/2);
-                            %                 stim(ss).dotfb(fb+1).overlay.xy(a,oof) = stim(ss).overlay.dotfb(fb+1).xy(a,oof) + ...
-                            %                     round(StimSizePix(a)/2);
-                            %             end
-                            % 
-                            %             stim(ss).overlay.dotage = stim(ss).overlay.dotage+1;
-                            %             if ~isempty(stim(ss).overlay.dotlifetime)
-                            %                 dd = stim(ss).overlay.dotage > stim(ss).overlay.dotlifetime;
-                            %                 stim(ss).overlay.dotage(dd) = stim(ss).overlay.dotage(dd)-...
-                            %                     stim(ss).overlay.dotlifetime;
-                            %                 % new locations for 'dead dots'
-                            %                 newdotsxy = [...
-                            %                     round(-StimSizePix(1)/2 + ...
-                            %                     rand(1,stim(ss).overlay.nDots).*StimSizePix(1)); ...
-                            %                     round(- StimSizePix(2)/2 + ...
-                            %                     rand(1,stim(ss).overlay.nDots).*StimSizePix(1))];
-                            %                 stim(ss).overlay.dotfb(fb+1).xy(:,dd) = newdotsxy(:,dd);
-                            %             end
-                            %         end
-                            %         % - draw
-                            %         Screen('DrawDots',monitor.w,...
-                            %             stim(ss).overlay.dotfb(fb+1).xy, stim(ss).overlay.dotsizepix, ...
-                            %             stim(ss).overlay.dotcol,monitor.center,0)
-                            %         % Screen('DrawTexture', monitor.w, ....
-                            %         %     StimMask, [], drect, []);
-                            %     case 'lines'
-                            %         if cF == 0 % first frame
-                            %             switch stim(ss).overlay.orientation
-                            %                 case 'horizontal'
-                            %                     stim(ss).overlay.nLines = ...
-                            %                         round(...
-                            %                         stim(ss).overlay.linedensity * ...
-                            %                         trialtype(T).stimsize(1));
-                            %                     linexy = zeros(1,2*stim(ss).overlay.nLines);
-                            %                     linexy(1,1:2:end) = -StimSizePix(1)/2;
-                            %                     linexy(1,2:2:end) = StimSizePix(1)/2;
-                            %                     linexy(2,1:2:end) = -StimSizePix(2)/2 : ...
-                            %                         StimSizePix(2)/stim(ss).overlay.nLines : ...
-                            %                         StimSizePix(2)/2;
-                            %                     linexy(2,2:2:end) = linexy(2,1:2:end);
-                            % 
-                            %                 case 'vertical'
-                            %                     stim(ss).overlay.nLines = ...
-                            %                         round(...
-                            %                         stim(ss).overlay.linedensity * ...
-                            %                         trialtype(T).stimsize(2));
-                            %                     linexy = zeros(1,2*stim(ss).overlay.nLines);
-                            %                     linexy(2,1:2:end) = -StimSizePix(2)/2;
-                            %                     linexy(2,2:2:end) = StimSizePix(2)/2;
-                            %                     linexy(1,1:2:end) = -StimSizePix(1)/2 : ...
-                            %                         StimSizePix(1)/stim(ss).overlay.nLines : ...
-                            %                         StimSizePix(1)/2;
-                            %                     linexy(1,2:2:end) = linexy(1,1:2:end);
-                            %             end
-                            %             stim(ss).overlay.linecol = [stim(ss).overlay.color ...
-                            %                 stim(ss).overlay.opacity];
-                            %         else
-                            %             switch stim(ss).overlay.orientation
-                            %                 case 'horizontal'
-                            %                     linexy(2,:) = linexy(2,:) + stim(ss).overlay.driftpixframe;
-                            %                     oof = linexy(2,:) > StimSizePix(2)/2;
-                            %                     linexy(2,oof) = linexy(2,oof)-StimSizePix(2);
-                            %                 case 'vertical'
-                            %                     linexy(1,:) = linexy(1,:) + stim(ss).overlay.driftpixframe;
-                            %                     oof = linexy(1,:) > StimSizePix(1)/2;
-                            %                     linexy(1,oof) = linexy(1,oof)-StimSizePix(1);
-                            %             end
-                            %         end
-                            %         % - draw
-                            %         Screen('DrawLines',monitor.w,...
-                            %             linexy, stim(ss).overlay.linewidthpix, ...
-                            %             stim(ss).overlay.linecol,monitor.center,0)
-                            %         % Screen('DrawTexture', monitor.w, ....
-                            %         %     StimMask, [], drect, []);
-                            % end
+                            switch stim(ss).overlay.type
+                                case 'dots'
+                                    if cF == 0 % - first frame
+                                        % locations
+                                        stim(ss).overlay.nDots = round(...
+                                            stim(ss).overlay.dotdensity * ...
+                                            trialtype(T).stimsize(1) * ...
+                                            trialtype(T).stimsize(2));
+                                        stim(ss).overlay.dotfb(fb+1).xy = [...
+                                            round(- StimSizePix(1)/2 + ...
+                                            rand(1,stim(ss).overlay.nDots).*StimSizePix(1)); ...
+                                            round(- StimSizePix(2)/2 + ...
+                                            rand(1,stim(ss).overlay.nDots).*StimSizePix(1))];
+                                        % colors
+                                        if ~isempty(stim(ss).overlay.color)
+                                            stim(ss).overlay.dotcol = [stim(ss).overlay.color ...
+                                                stim(ss).overlay.opacity];
+                                        else
+                                            if stim(ss).overlay.contrastbin
+                                                stim(ss).overlay.dotcol = 0.5 + ...
+                                                    (round(rand(1,stim(ss).overlay.nDots)).*stim(ss).overlay.contrast) - ...
+                                                    stim(ss).overlay.contrast/2;
+                                            else
+                                                stim(ss).overlay.dotcol = 0.5 + ...
+                                                    (rand(1,stim(ss).overlay.nDots).*stim(ss).overlay.contrast) - ...
+                                                    stim(ss).overlay.contrast/2;
+                                            end
+                                            stim(ss).overlay.dotcol = [...
+                                                stim(ss).overlay.dotcol;...
+                                                stim(ss).overlay.dotcol;...
+                                                stim(ss).overlay.dotcol;...
+                                                stim(ss).overlay.opacity*ones(1,stim(ss).overlay.nDots)];
+                                        end
+
+                                        % dot age
+                                        stim(ss).overlay.dotage = round(rand(1,stim(ss).overlay.nDots).*...
+                                            stim(ss).overlay.dotlifetime);
+                                    else
+                                        % - move
+                                        for a = 1:2
+                                            stim(ss).overlay.dotfb(fb+1).xy(a,:) = stim(ss).overlay.dotfb(fb+1).xy(a,:) + ...
+                                                stim(ss).overlay.driftpixframe(a);
+                                            oof = stim(ss).overlay.dotfb(fb+1).xy(a,:) > ...
+                                                round(StimSizePix(a)/2);
+                                            stim(ss).overlay.dotfb(fb+1).xy(a,oof) = stim(ss).overlay.dotfb(fb+1).xy(a,oof) - ...
+                                                round(StimSizePix(a)/2);
+                                            oof = stim(ss).overlay.dotfb(fb+1).xy(a,:) < ...
+                                                round(-StimSizePix(a)/2);
+                                            stim(ss).dotfb(fb+1).overlay.xy(a,oof) = stim(ss).overlay.dotfb(fb+1).xy(a,oof) + ...
+                                                round(StimSizePix(a)/2);
+                                        end
+
+                                        stim(ss).overlay.dotage = stim(ss).overlay.dotage+1;
+                                        if ~isempty(stim(ss).overlay.dotlifetime)
+                                            dd = stim(ss).overlay.dotage > stim(ss).overlay.dotlifetime;
+                                            stim(ss).overlay.dotage(dd) = stim(ss).overlay.dotage(dd)-...
+                                                stim(ss).overlay.dotlifetime;
+                                            % new locations for 'dead dots'
+                                            newdotsxy = [...
+                                                round(-StimSizePix(1)/2 + ...
+                                                rand(1,stim(ss).overlay.nDots).*StimSizePix(1)); ...
+                                                round(- StimSizePix(2)/2 + ...
+                                                rand(1,stim(ss).overlay.nDots).*StimSizePix(1))];
+                                            stim(ss).overlay.dotfb(fb+1).xy(:,dd) = newdotsxy(:,dd);
+                                        end
+                                    end
+                                    % - draw
+                                    Screen('DrawDots',monitor.w,...
+                                        stim(ss).overlay.dotfb(fb+1).xy, stim(ss).overlay.dotsizepix, ...
+                                        stim(ss).overlay.dotcol,monitor.center,0)
+                                    Screen('DrawTexture', monitor.w, ....
+                                        StimMask, [], drect, []);
+                                case 'lines'
+                                    if cF == 0 % first frame
+                                        switch stim(ss).overlay.orientation
+                                            case 'horizontal'
+                                                stim(ss).overlay.nLines = ...
+                                                    round(...
+                                                    stim(ss).overlay.linedensity * ...
+                                                    trialtype(T).stimsize(1));
+                                                linexy = zeros(1,2*stim(ss).overlay.nLines);
+                                                linexy(1,1:2:end) = -StimSizePix(1)/2;
+                                                linexy(1,2:2:end) = StimSizePix(1)/2;
+                                                linexy(2,1:2:end) = -StimSizePix(2)/2 : ...
+                                                    StimSizePix(2)/stim(ss).overlay.nLines : ...
+                                                    StimSizePix(2)/2;
+                                                linexy(2,2:2:end) = linexy(2,1:2:end);
+
+                                            case 'vertical'
+                                                stim(ss).overlay.nLines = ...
+                                                    round(...
+                                                    stim(ss).overlay.linedensity * ...
+                                                    trialtype(T).stimsize(2));
+                                                linexy = zeros(1,2*stim(ss).overlay.nLines);
+                                                linexy(2,1:2:end) = -StimSizePix(2)/2;
+                                                linexy(2,2:2:end) = StimSizePix(2)/2;
+                                                linexy(1,1:2:end) = -StimSizePix(1)/2 : ...
+                                                    StimSizePix(1)/stim(ss).overlay.nLines : ...
+                                                    StimSizePix(1)/2;
+                                                linexy(1,2:2:end) = linexy(1,1:2:end);
+                                        end
+                                        stim(ss).overlay.linecol = [stim(ss).overlay.color ...
+                                            stim(ss).overlay.opacity];
+                                    else
+                                        switch stim(ss).overlay.orientation
+                                            case 'horizontal'
+                                                linexy(2,:) = linexy(2,:) + stim(ss).overlay.driftpixframe;
+                                                oof = linexy(2,:) > StimSizePix(2)/2;
+                                                linexy(2,oof) = linexy(2,oof)-StimSizePix(2);
+                                            case 'vertical'
+                                                linexy(1,:) = linexy(1,:) + stim(ss).overlay.driftpixframe;
+                                                oof = linexy(1,:) > StimSizePix(1)/2;
+                                                linexy(1,oof) = linexy(1,oof)-StimSizePix(1);
+                                        end
+                                    end
+                                    % - draw
+                                    Screen('DrawLines',monitor.w,...
+                                        linexy, stim(ss).overlay.linewidthpix, ...
+                                        stim(ss).overlay.linecol,monitor.center,0)
+                                    Screen('DrawTexture', monitor.w, ....
+                                        StimMask, [], drect, []);
+                            end
                     end
                 end
                 %fprintf('stim done\n')
@@ -1004,7 +1007,7 @@ try
                 % alignment after stimulus
                 for fb = [0 1]
                     Screen('SelectStereoDrawBuffer', monitor.w, fb);
-                    % DrawAlign(monitor, fb, bg);
+                    DrawAlign(monitor, fb, bg);
                 end
                 %fprintf('align done\n')
 
@@ -1018,8 +1021,7 @@ try
 
                 vbl = Screen('Flip', monitor.w, vbl+0.9*monitor.FrameDur);
                 cF= cF + 1; % current frame update
-                %fprintf('flip reached\n')
-                
+                fprintf('flip reached\n')
                 if ~StimStarted
                     % log
                     log.ev = [log.ev; {vbl,'StimStart',T}];
@@ -1097,7 +1099,7 @@ try
     settings.block = block;
     settings.expt = expt;
 
-    save(fullfile(RunPath, log.fld, log.Label, 'logfile'),'settings','log');
+    save(fullfile(RunPath, log.fld, log.Label, 'settings'));
 
     % save the eye data and close off tracker
     if eyetracker.do
@@ -1121,16 +1123,15 @@ try
     Screen('DrawingFinished', monitor.w);
     vbl = Screen('Flip', monitor.w);
     WaitSecs(1); % pause a few seconds
-    Screen('LoadNormalizedGammaTable', monitor.w, monitor.OLD_Gamtable);
     sca;
     ListenChar();
     ShowCursor;
-    
+    Screen('LoadNormalizedGammaTable', monitor.w, OLD_Gamtable);
 catch
     %% Error handling
-    psychrethrow(psychlasterror);
-    Screen('LoadNormalizedGammaTable', monitor.w, monitor.OLD_Gamtable);
     sca; ShowCursor;
+    psychrethrow(psychlasterror);
+    Screen('LoadNormalizedGammaTable', monitor.w, OLD_Gamtable);
 end
 
 %% Repeating functions
