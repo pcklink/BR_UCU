@@ -1,0 +1,25 @@
+@Anywhere
+- check mask as it seems to be wrong
+    - DriftDemo2 explains this
+- check grating creation and drift reset
+    - again DriftDemo2 shows an efficient method
+- check the overlays for the image stimuli
+- check key-press logging
+- check prestim appearances
+
+@UU
+- check eyetracker calibration
+- check eyatracker logging
+
+
+For students:
+- determine the relation between the  orientation / direction settingg and what is visible on both screens
+    - what is zero degrees?
+- which framebuffer/eye corresponds to which screen?
+- get microphone and check if recording works
+
+>> in general: 
+- read error messages carefully
+- post problems in the github repository as an 'issue' or in the Teams channel (create a thread per student/experiment)
+    - https://github.com/pcklink/BR_UCU
+    - give Chris your github account name for access

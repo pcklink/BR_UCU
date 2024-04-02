@@ -29,10 +29,16 @@ keys.resp = {'Left','Right'};
 log.fld = 'default_log';
 
 %% Stimuli ----
+
+% NB! For our current setup:
+% 1 dva is about 45.5 pixels 
+% 1 s is 60 frames
+% drift speed < 1.33 means less than 1pix/fr
+% better go a bit higher for smooth motion, e.g. 
+
 % background --
 bg.color = [0.5 0.5 0.5];
 bg.textcolor = [1 1 1];
-% bg.align.Frame.Size = stimulus size + .5; % in deg (define after stim)
 bg.align.Frame.Type = 0; % 0 = oval, 1 = rectangle
 bg.align.Frame.PenWidth = .2; % in deg
 bg.align.Frame.CrossLength = [6 6]; % in deg
