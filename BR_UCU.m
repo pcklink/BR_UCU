@@ -9,12 +9,11 @@ function BR_UCU(settings_file)
 
 %% Process arguments ------
 if nargin<1
-    settings_file = 'settings_def';
-else
-    log.settings_file = settings_file;
+    settings_file = 'settings_def'; % the default
 end
+log.settings_file = settings_file; % log the file name
 
-% Debug mode
+% Debug mode allows subscreen stim display
 % NoDebug / UU / CKHOME / CKNIN
 DebugMode = 'NoDebug';
 
@@ -45,13 +44,12 @@ else
     log.Handedness = 'R';
 end
 
-
 %% Calibrate eye tracker ------
 if eyetracker.do && eyetracker.calibrate % alternatively do this with a separate script
     try
-        SetMonitors('mirrored');
-        calibrateTobii(eyetracker, log);
-        SetMonitors('extended')
+        SetMonitors('mirrored'); % set monitors in mirrored mode
+        calibrateTobii(eyetracker, log); % run calibration
+        SetMonitors('extended') % set monitors in extended mode
     catch
         fprintf('ERROR doing eyetracker calibration\n')
     end
@@ -67,9 +65,8 @@ try
     Screen('Preference','SkipSyncTests',1);
 
     %Do some basic initializing
-    PsychDefaultSetup(2);
-    HideCursor;
-    %ListenChar(2); % silence keyboard for matlab
+    PsychDefaultSetup(2); HideCursor;
+    ListenChar(2); % silence keyboard for matlab
 
     % Get screen info
     scr = Screen('screens'); % get screen info
@@ -94,7 +91,6 @@ try
     monitor.Deg2Pix = (tand(1)*monitor.distance)*...
         monitor.PixWidth/monitor.MmWidth;
 
-
     switch DebugMode
         case 'NoDebug'
             WindowRect = []; %fullscreen
@@ -109,7 +105,7 @@ try
     % Open a window
     PsychImaging('PrepareConfiguration');
     if monitor.fliphorizontal
-        PsychImaging('AddTask','AllViews','FlipHorizontal');
+        PsychImaging('AddTask','AllViews','FlipHorizontal'); % mirror everything
     end
     [monitor.w, monitor.wrect] = ...
         PsychImaging('OpenWindow', monitor.scr, bg.color, ...
@@ -131,22 +127,22 @@ try
     % Maximum useable priorityLevel on this system:
     priorityLevel = MaxPriority(monitor.w); Priority(priorityLevel);
 
-    % Get the refreshrate
+    % Get the frame duration and refreshrate
     monitor.FrameDur = Screen('GetFlipInterval', monitor.w);
     monitor.refreshRate = round(Screen('NominalFrameRate', monitor.scr));
 
-    % Log init
+    % Log init. Create a table for events.
     log.ev = array2table(nan(0,3),'VariableNames',{'t','type','info'});
 
     % Eyetracker init --
     if eyetracker.do
-        run(fullfile(eyetracker.toolboxfld,'addTittaToPath'));
-        settings = Titta.getDefaults(eyetracker.type);
+        run(fullfile(eyetracker.toolboxfld,'addTittaToPath')); % add toolbox to path
+        settings = Titta.getDefaults(eyetracker.type); % specify which eyetracker
         settings.debugMode = false;
         EThndl = Titta(settings);
-        EThndl.init();
-        EThndl.buffer.start('gaze'); WaitSecs(.8);
-        log.ev = [log.ev; {GetSecs,'EyeStart','GazeBuffer'}];
+        EThndl.init(); % initiate eyetracker
+        EThndl.buffer.start('gaze'); WaitSecs(.8); % start gazebuffer
+        log.ev = [log.ev; {GetSecs,'EyeStart','GazeBuffer'}]; % log this
     end
 
     % Sound init --
@@ -167,7 +163,6 @@ try
         nrchannels = 2;
         PsychPortAudio('FillBuffer', hplay, wavedata);
     end
-
 
     %% Prepare stimuli ------
     %% alignment stim --
@@ -835,9 +830,9 @@ try
             vbl = Screen('Flip', monitor.w);
             GapT0 = vbl;
 
-            log.ev = [log.ev; {secs,'GapStart',T}];
+            log.ev = [log.ev; {vbl,'GapStart',T}];
             if eyetracker.do
-                EThndl.sendMessage('GapStart',secs)
+                EThndl.sendMessage('GapStart',vbl)
             end
 
             % start audio recording here
@@ -1182,33 +1177,53 @@ try
                 end
             end
             t=t+1; % next trial
+
+            %% ITI ---
+            % bg alignment
+            for fb = [0 1]
+                DrawBackground(monitor, fb, bg);
+                DrawAlignFrame(monitor, fb, bg);
+            end
+            Screen('DrawingFinished',monitor.w);
+            vbl = Screen('Flip', monitor.w);
+            ITIT0 = vbl;
+
+            log.ev = [log.ev; {vbl,'ITIStart',T}];
+            if eyetracker.do
+                EThndl.sendMessage('ITIStart',vbl)
+            end
+
+            while (GetSecs - ITIT0) < trialtime.ITIT && ~StopExp
+                % check keys for escape
+                [~, ~, keyCode] = KbCheck;
+                if strcmp(KbName(find(keyCode)),keys.esc)
+                    StopExp = true;
+                    break;
+                end
+            end
+            vbl = GetSecs;
+
         end
         b=b+1; % next block
     end
     %% Save the logs ------
-    settings.monitor = monitor;
-    settings.eyetracker = eyetracker;
-    settings.sound = sound;
-    settings.keys = keys;
-    settings.bg = bg;
-    settings.fix = fix;
-    settings.prestim = prestim;
-    settings.stim = stim;
-    settings.trialtime = trialtime;
-    settings.trialtype = trialtype;
-    settings.block = block;
-    settings.expt = expt;
-
+    % create some order in the variables
+    settings.monitor = monitor; settings.eyetracker = eyetracker;
+    settings.sound = sound; settings.keys = keys;
+    settings.bg = bg; settings.fix = fix; settings.prestim = prestim; settings.stim = stim;
+    settings.trialtime = trialtime; settings.trialtype = trialtype;
+    settings.block = block; settings.expt = expt;
+    % save the log
     save(fullfile(RunPath, log.fld, log.Label, 'logfile'),'settings','log');
 
     % save the eye data and close off tracker
     if eyetracker.do
-        EThndl.buffer.stop('gaze');
+        EThndl.buffer.stop('gaze'); % close the buffer
         dat = EThndl.collectSessionData();
         dat.expt.resolution = monitor.wrect(3:4);
-        fn = ['eyedata_' log.Label];
-        EThndl.saveData(dat, fullfile(log.fld,log.Label,fn), true);
-        EThndl.deInit();
+        fn = ['eyedata_' log.Label]; % create a label
+        EThndl.saveData(dat, fullfile(log.fld,log.Label,fn), true); % save
+        EThndl.deInit(); % shut down
     end
 
     %% Thanks screen -
