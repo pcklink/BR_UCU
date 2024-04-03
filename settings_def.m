@@ -47,6 +47,8 @@ bg.align.AlignCircles.draw = true; % if false these are not drawn
 bg.align.AlignCircles.n = 150; % number of circles drawn in full window
 bg.align.AlignCircles.ColorRange = [0.3 0.7]; % [R G B] range: 0-1
 bg.align.AlignCircles.SizeRange = [.5 2]; % in deg
+bg.align.AlignCircles.OpenArea = [6 6]; % in deg
+
 
 fix.size = 0.2; % dva diameter
 fix.color = [1 0 0];

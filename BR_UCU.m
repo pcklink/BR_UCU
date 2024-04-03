@@ -172,28 +172,27 @@ try
     %% Prepare stimuli ------
     % alignment stim --
     if bg.align.AlignCircles.draw
-
-        % random colors within range
-        bg.align.AlignCircles.Colors = (bg.align.AlignCircles.ColorRange(2) - ...
-            bg.align.AlignCircles.ColorRange(1)) .* ...
-            rand(1,bg.align.AlignCircles.n) + ...
-            bg.align.AlignCircles.ColorRange(1);
-        bg.align.AlignCircles.Colors = [...
-            bg.align.AlignCircles.Colors; ...
-            bg.align.AlignCircles.Colors; ...
-            bg.align.AlignCircles.Colors];
-
-        % random sizes within range
-        bg.align.AlignCircles.Sizes = (bg.align.AlignCircles.SizeRange(2) - ...
-            bg.align.AlignCircles.SizeRange(1)) .*...
-            rand(1,bg.align.AlignCircles.n) + ...
-            bg.align.AlignCircles.SizeRange(1);
-        bg.align.AlignCircles.Sizes = [...
-            bg.align.AlignCircles.Sizes;...
-            bg.align.AlignCircles.Sizes];
-
-        % calculate coordinates for these circles
         if bg.align.AlignCircles.n > 0
+
+            % random colors within range
+            bg.align.AlignCircles.Colors = (bg.align.AlignCircles.ColorRange(2) - ...
+                bg.align.AlignCircles.ColorRange(1)) .* ...
+                rand(1,bg.align.AlignCircles.n) + ...
+                bg.align.AlignCircles.ColorRange(1);
+            bg.align.AlignCircles.Colors = [...
+                bg.align.AlignCircles.Colors; ...
+                bg.align.AlignCircles.Colors; ...
+                bg.align.AlignCircles.Colors];
+
+            % random sizes within range
+            bg.align.AlignCircles.Sizes = (bg.align.AlignCircles.SizeRange(2) - ...
+                bg.align.AlignCircles.SizeRange(1)) .*...
+                rand(1,bg.align.AlignCircles.n) + ...
+                bg.align.AlignCircles.SizeRange(1);
+            bg.align.AlignCircles.Sizes = [...
+                bg.align.AlignCircles.Sizes;...
+                bg.align.AlignCircles.Sizes];
+
             % size in pix
             bg.align.AlignCircles.SizesPix = round(...
                 bg.align.AlignCircles.Sizes .* monitor.Deg2Pix);
@@ -214,6 +213,25 @@ try
             bg.align.AlignCircles.Rects = CenterRectOnPoint(...
                 bg.align.AlignCircles.Rects,...
                 monitor.center(1), monitor.center(2));
+            
+            bg.align.AlignCircles.OpenAreaPix = ...
+                bg.align.AlignCircles.OpenArea.* monitor.Deg2Pix;
+
+            keepbubbles = ones(1,size(bg.align.AlignCircles.Rects,2));
+            for d = 1:size(bg.align.AlignCircles.Rects,2)
+                if ((bg.align.AlignCircles.Rects(1,d) > -bg.align.AlignCircles.OpenAreaPix(1)/2 && ...
+                        bg.align.AlignCircles.Rects(1,d) < bg.align.AlignCircles.OpenAreaPix(1)/2) || ...
+                        (bg.align.AlignCircles.Rects(3,d) > -bg.align.AlignCircles.OpenAreaPix(1)/2 && ...
+                        bg.align.AlignCircles.Rects(3,d) < bg.align.AlignCircles.OpenAreaPix(1)/2)) && ...
+                        ((bg.align.AlignCircles.Rects(2,d) > -bg.align.AlignCircles.OpenAreaPix(2)/2 && ...
+                        bg.align.AlignCircles.Rects(2,d) < bg.align.AlignCircles.OpenAreaPix(2)/2) || ...
+                        (bg.align.AlignCircles.Rects(4,d) > -bg.align.AlignCircles.OpenAreaPix(2)/2 && ...
+                        bg.align.AlignCircles.Rects(4,d) < bg.align.AlignCircles.OpenAreaPix(2)/2))
+                    keepbubbles(d) = 0;
+                end
+            end
+            bg.align.AlignCircles.Rects = bg.align.AlignCircles.Rects(keepbubbles,:);
+            bg.align.AlignCircles.Colors = bg.align.AlignCircles.Colors(keepbubbles,:);
         end
 
         fix.sizepix = round(fix.size.*monitor.Deg2Pix);
@@ -425,7 +443,8 @@ try
             %% FIX ----
             FixT0 = 0; vbl = 0;
             for fb = [0 1]
-                DrawAlign(monitor, fb, bg);
+                DrawABackground(monitor, fb, bg);
+                DrawAlignFrame(monitor, fb, bg);
                 Screen('FillOval', monitor.w, fix.color, fix.rect);
             end
             Screen('DrawingFinished',monitor.w);
@@ -470,9 +489,8 @@ try
 
                 % instruction screen --
                 for fb = [0 1] % both framebuffers for stereomode
-                    Screen('SelectStereoDrawBuffer', monitor.w, fb);
                     % BG
-                    Screen('FillRect', monitor.w, bg.color, []);
+                    DrawBackground(monitor, fb, bg);
                     % text
                     DrawFormattedText(monitor.w,prestim(ps).instruct, ...
                         'center','center',bg.textcolor);
@@ -488,7 +506,7 @@ try
                 f=1; % framenuber
                 while (vbl - PreStimT0) < trialtime.PrestimT && ~StopExp
                     for fb = [0 1]
-                        Screen('SelectStereoDrawBuffer', monitor.w, fb);
+                        DrawBackground(monitor, fb, bg);
                         switch prestim(ps).attentiontype
                             case 'endogenous'
                                 switch prestim(ps).type
@@ -687,10 +705,9 @@ try
                         end
                     end
 
-                    % draw the alignment stuff
+                    % draw the alignment frame
                     for fb = [0 1]
-                        Screen('SelectStereoDrawBuffer', monitor.w, fb);
-                        DrawAlign(monitor, fb, bg);
+                        DrawAlignFrame(monitor, fb, bg);
                     end
 
                     % fixation dot
@@ -715,9 +732,8 @@ try
                 % question and response screen --
                 % instruction screen --
                 for fb = [0 1] % both framebuffers for stereomode
-                    Screen('SelectStereoDrawBuffer', monitor.w, fb);
                     % BG
-                    Screen('FillRect', monitor.w, bg.color, []);
+                    DrawBackground(monitor, fb, bg);
                     % text
                     DrawFormattedText(monitor.w,prestim(ps).quest, ...
                         'center','center',bg.textcolor);
@@ -742,7 +758,8 @@ try
             %% GAP ---
             % bg alignment
             for fb = [0 1]
-                DrawAlign(monitor, fb, bg);
+                DrawBackground(monitor, fb, bg);
+                DrawAlignFrame(monitor, fb, bg);
             end
             Screen('DrawingFinished',monitor.w);
             vbl = Screen('Flip', monitor.w);
@@ -786,7 +803,7 @@ try
             while vbl-StimStarted < trialtime.StimT  && ~StopExp
                 % stim
                 for fb = [0 1]
-                    Screen('SelectStereoDrawBuffer', monitor.w, fb);
+                    DrawBackground(monitor, fb, bg);
                     % which stim
                     ss = trialtype(T).eye(fb+1).stim;
                     switch stim(ss).type
@@ -1010,8 +1027,7 @@ try
 
                 % alignment after stimulus
                 for fb = [0 1]
-                    Screen('SelectStereoDrawBuffer', monitor.w, fb);
-                    DrawAlign(monitor, fb, bg);
+                    DrawAlignFrame(monitor, fb, bg);
                 end
                 %fprintf('align done\n')
 
@@ -1138,7 +1154,7 @@ catch
 end
 
 %% Repeating functions
-    function DrawAlign(monitor, fb,  bg)
+    function DrawBackground(monitor, fb,  bg)
         Screen('SelectStereoDrawBuffer', monitor.w, fb);
         % BG
         Screen('FillRect', monitor.w, bg.color, []);
@@ -1147,7 +1163,23 @@ end
             Screen('FillOval',monitor.w, bg.align.AlignCircles.Colors,...
                 bg.align.AlignCircles.Rects);
         end
-        %fprintf('circles drawn\n');
+        % Draw empty background rect ===============
+        RectBorders = ...
+            [0; 0;...
+            bg.align.Frame.SizePix(1) + 10 + bg.align.Frame.PenWidthPix; ...
+            bg.align.Frame.SizePix(2) + 10 + bg.align.Frame.PenWidthPix];
+        RectBorders = CenterRectOnPoint(RectBorders,...
+            monitor.center(1), monitor.center(2));
+        if bg.align.Frame.Type == 0
+            Screen('FillOval', monitor.w, bg.color, RectBorders);
+        else
+            Screen('FillRect', monitor.w, bg.color, RectBorders);
+        end
+        %fprintf('bubbles drawn\n');
+    end
+
+    function DrawAlignFrame(monitor, fb,  bg)
+        Screen('SelectStereoDrawBuffer', monitor.w, fb);
         % Draw crosshairs ===============
         % leave center open
         xy=[-bg.align.Frame.CrossLengthPix(1)/2 ...
