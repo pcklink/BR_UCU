@@ -68,7 +68,7 @@ try
 
     %Do some basic initializing
     PsychDefaultSetup(2);
-    HideCursor; 
+    HideCursor;
     %ListenChar(2); % silence keyboard for matlab
 
     % Get screen info
@@ -101,9 +101,9 @@ try
         case 'UU'
             WindowRect = [0 0 1200 600]; %#ok<*UNRCH> %debug
         case 'CKHOME'
-            WindowRect = [1080 0 1080+1000 500]; %#ok<*UNRCH> %debug
+            WindowRect = [1080 0 1080+1500 750]; %#ok<*UNRCH> %debug
         case 'CKNIN'
-            WindowRect = [1920 0 1920+1000 500]; %#ok<*UNRCH> %debug
+            WindowRect = [1920 0 1920+1500 750]; %#ok<*UNRCH> %debug
     end
 
     % Open a window
@@ -156,8 +156,8 @@ try
         InitializePsychSound(double(reqlatencyclass > 1));
         hmic = PsychPortAudio('Open', sound.mic.device, 2, ...
             reqlatencyclass, [], 2);
-        s = PsychPortAudio('GetStatus', hmic);
-        sndfreq = s.SampleRate;
+        snd = PsychPortAudio('GetStatus', hmic);
+        sndfreq = snd.SampleRate;
         PsychPortAudio('GetAudioData', hmic, 10);
 
         % play device
@@ -170,7 +170,7 @@ try
 
 
     %% Prepare stimuli ------
-    % alignment stim --
+    %% alignment stim --
     if bg.align.AlignCircles.draw
         if bg.align.AlignCircles.n > 0
 
@@ -197,41 +197,50 @@ try
             bg.align.AlignCircles.SizesPix = round(...
                 bg.align.AlignCircles.Sizes .* monitor.Deg2Pix);
 
-            % The left-top corners
-            bg.align.AlignCircles.LTCorner = ...
-                [-25+rand(1,bg.align.AlignCircles.n) .* monitor.PixWidth;...
-                -25+rand(1,bg.align.AlignCircles.n) .* monitor.PixHeight];
-
-            % the full rectangles
+            % rects
             bg.align.AlignCircles.Rects = [...
-                bg.align.AlignCircles.LTCorner(1,:);...
-                bg.align.AlignCircles.LTCorner(2,:);...
-                bg.align.AlignCircles.LTCorner(1,:) + ...
-                bg.align.AlignCircles.SizesPix(1,:);...
-                bg.align.AlignCircles.LTCorner(2,:) + ...
+                zeros(1,size(bg.align.AlignCircles.SizesPix,2)); ...
+                zeros(1,size(bg.align.AlignCircles.SizesPix,2));
+                bg.align.AlignCircles.SizesPix(1,:); ...
                 bg.align.AlignCircles.SizesPix(2,:)];
-            bg.align.AlignCircles.Rects = CenterRectOnPoint(...
-                bg.align.AlignCircles.Rects,...
-                monitor.center(1), monitor.center(2));
-            
+
+            % locations
+            bg.align.AlignCircles.XY = [...
+                round(rand(1,size(bg.align.AlignCircles.SizesPix,2)).*...
+                (monitor.wrect(3)-monitor.wrect(1)));...
+                round(rand(1,size(bg.align.AlignCircles.SizesPix,2)).*...
+                (monitor.wrect(4)-monitor.wrect(2)))];
+
+            % center rect on points
+            for r = 1: size(bg.align.AlignCircles.Rects,2)
+                bg.align.AlignCircles.Rects(:,r) = ...
+                    CenterRectOnPoint(bg.align.AlignCircles.Rects(:,r),...
+                    bg.align.AlignCircles.XY(1,r),...
+                    bg.align.AlignCircles.XY(2,r));
+            end
+
+            % open area
             bg.align.AlignCircles.OpenAreaPix = ...
                 bg.align.AlignCircles.OpenArea.* monitor.Deg2Pix;
+            OpenRect = [-bg.align.AlignCircles.OpenAreaPix(1)/2 ...
+                -bg.align.AlignCircles.OpenAreaPix(2)/2 ...
+                bg.align.AlignCircles.OpenAreaPix(1)/2 ...
+                bg.align.AlignCircles.OpenAreaPix(2)/2];
+            OpenRect = CenterRectOnPoint(OpenRect,...
+                monitor.center(1), monitor.center(2));
 
-            keepbubbles = ones(1,size(bg.align.AlignCircles.Rects,2));
-            for d = 1:size(bg.align.AlignCircles.Rects,2)
-                if ((bg.align.AlignCircles.Rects(1,d) > -bg.align.AlignCircles.OpenAreaPix(1)/2 && ...
-                        bg.align.AlignCircles.Rects(1,d) < bg.align.AlignCircles.OpenAreaPix(1)/2) || ...
-                        (bg.align.AlignCircles.Rects(3,d) > -bg.align.AlignCircles.OpenAreaPix(1)/2 && ...
-                        bg.align.AlignCircles.Rects(3,d) < bg.align.AlignCircles.OpenAreaPix(1)/2)) && ...
-                        ((bg.align.AlignCircles.Rects(2,d) > -bg.align.AlignCircles.OpenAreaPix(2)/2 && ...
-                        bg.align.AlignCircles.Rects(2,d) < bg.align.AlignCircles.OpenAreaPix(2)/2) || ...
-                        (bg.align.AlignCircles.Rects(4,d) > -bg.align.AlignCircles.OpenAreaPix(2)/2 && ...
-                        bg.align.AlignCircles.Rects(4,d) < bg.align.AlignCircles.OpenAreaPix(2)/2))
-                    keepbubbles(d) = 0;
+            % remove bubbles that are in open area
+            keepbubbles = true(1,size(bg.align.AlignCircles.XY,2));
+            for d = 1:size(bg.align.AlignCircles.XY,2)
+                if IsInRect(bg.align.AlignCircles.XY(1,d),...
+                        bg.align.AlignCircles.XY(2,d),OpenRect)
+                    keepbubbles(d) = false;
                 end
             end
-            bg.align.AlignCircles.Rects = bg.align.AlignCircles.Rects(keepbubbles,:);
-            bg.align.AlignCircles.Colors = bg.align.AlignCircles.Colors(keepbubbles,:);
+
+            bg.align.AlignCircles.Rects = bg.align.AlignCircles.Rects(:,keepbubbles);
+            bg.align.AlignCircles.Colors = bg.align.AlignCircles.Colors(:,keepbubbles);
+
         end
 
         fix.sizepix = round(fix.size.*monitor.Deg2Pix);
@@ -252,7 +261,6 @@ try
         bg.align.Frame.PenWidthPix = monitor.maxpenwidth;
     end
 
-
     %% prestim --
     if trialtime.PrestimT % only if a prestim phase is set
         for ps = 1:length(prestim)
@@ -268,17 +276,20 @@ try
                     a = cos(angle)*f; b = sin(angle)*f; phase=0;
                     m = sin(a*x+b*y+phase);
                     grattex0 = (0.5+0.5*m*prestim(ps).contrast);
-                    grattex1 = (0.5+0.5*m*(...
-                        prestim(ps).contrast + ...
-                        prestim(ps).transient.contrastincr));
+                    if strcmp(prestim(ps).attentiontype,'exogenous')
+                        grattex1 = (0.5+0.5*m*...
+                            (prestim(ps).contrast + prestim(ps).transient.contrastincr));
+                    end
                     % Create the grating textures
-                    prestim(ps).GratText0(ps) = ...
+                    prestim(ps).GratText0 = ...
                         Screen('MakeTexture', monitor.w, grattex0); %#ok<*AGROW>
-                    prestim(ps).GratText1(ps) = ...
-                        Screen('MakeTexture', monitor.w, grattex1);
+                    if strcmp(prestim(ps).attentiontype,'exogenous')
+                        prestim(ps).GratText1 = ...
+                            Screen('MakeTexture', monitor.w, grattex1);
+                    end
                     % speed
                     prestim(ps).driftpixsec = round(...
-                        stim(ps).driftspeed.*monitor.Deg2Pix);
+                        prestim(ps).driftspeed.*monitor.Deg2Pix);
                     prestim(ps).driftpixframe = round(...
                         prestim(ps).driftpixsec ./ monitor.refreshRate);
                     prestim(ps).driftreset = monitor.refreshRate./...
@@ -293,6 +304,7 @@ try
                         prestim(ps).driftpixsec ./ monitor.refreshRate);
             end
         end
+        %fprintf('Prestim created\n');
     end
 
     %% stim --
@@ -331,8 +343,7 @@ try
                 % load image
                 stim(ss).imgmat = imread(fullfile(RunPath,'images',stim(ss).image));
                 % to texture
-                stim(ss).imgtex = Screen('MakeTexture', monitor.w, double(stim(ss).imgmat) ...
-                    );
+                stim(ss).imgtex = Screen('MakeTexture', monitor.w, stim(ss).imgmat);
                 switch stim(ss).overlay.type
                     case 'dots'
                         stim(ss).overlay.dotsizepix = ...
@@ -364,7 +375,7 @@ try
         end
     end
 
-    
+
     %% Run the experiment ------
     StopExp = false;
 
@@ -422,28 +433,29 @@ try
             %% generic
             StimSizePix = round(trialtype(T).stimsize .* monitor.Deg2Pix);
             bg.align.Frame.SizePix = StimSizePix;
-
             [mX, mY] = meshgrid(1:StimSizePix(1), 1:StimSizePix(2));
-            maskcenter = StimSizePix/2; maskradius = StimSizePix/2; 
-            maskmat = (mX / (StimSizePix(1)/2)).^2 + ...
-                (mY / (StimSizePix(2)/2)).^2 <= 1; % Equation of an oval
+
+            maskcenter = StimSizePix/2;
+            maskradius = StimSizePix/2;
             dH = (mX - maskcenter(1)) / maskradius(1);
             dV = (mY- maskcenter(2)) / maskradius(2);
             maskmat = (dH.^2 + dV.^2 <= 1);
             maskbg = ~isnan(maskmat);
+
             masktext(:,:,1) = maskbg .* bg.color(1);
             masktext(:,:,2) = maskbg .* bg.color(2);
             masktext(:,:,3) = maskbg .* bg.color(3);
-            masktext(:,:,4) = maskmat;
+            masktext(:,:,4) = -maskmat+1;
 
-            StimMask = Screen('MakeTexture', monitor.w, uint8(masktext));
+            StimMask = Screen('MakeTexture', monitor.w, masktext);
+            %fprintf('Mask created\n')
 
             ps = trialtype(T).prestim;
 
             %% FIX ----
             FixT0 = 0; vbl = 0;
             for fb = [0 1]
-                DrawABackground(monitor, fb, bg);
+                DrawBackground(monitor, fb, bg);
                 DrawAlignFrame(monitor, fb, bg);
                 Screen('FillOval', monitor.w, fix.color, fix.rect);
             end
@@ -477,11 +489,10 @@ try
                 switch prestim(ps).attentiontype
                     case 'endogenous'
                         psOris = CreatePrestimEndoOri(monitor, prestim, ps);
-                    case 'exogneous'
+                    case 'exogenous'
                         total_fr = round(trialtime.PrestimT*monitor.refreshRate);
                         trans_frw = round(...
-                            prestim(ps).transient.timewindow*monitor.refreshRate) + ...
-                            total_fr;
+                            prestim(ps).transient.timewindow*monitor.refreshRate + total_fr);
                         trans_frw = Shuffle(trans_frw(1):trans_frw(2));
                         transframes = [trans_frw(1) trans_frw(1)+...
                             round(prestim(ps).transient.duration*monitor.refreshRate)];
@@ -492,8 +503,13 @@ try
                     % BG
                     DrawBackground(monitor, fb, bg);
                     % text
-                    DrawFormattedText(monitor.w,prestim(ps).instruct, ...
-                        'center','center',bg.textcolor);
+                    if ~isempty(prestim(ps).instruct)
+                        DrawFormattedText(monitor.w,prestim(ps).instruct, ...
+                            'center','center',bg.textcolor);
+                    else
+                        DrawFormattedText(monitor.w,'Press key', ...
+                            'center','center',bg.textcolor);
+                    end
                 end
                 Screen('DrawingFinished',monitor.w);
                 vbl = Screen('Flip', monitor.w);
@@ -511,213 +527,261 @@ try
                             case 'endogenous'
                                 switch prestim(ps).type
                                     case 'grating'
-                                        % - get rect
-                                        rectshift = ...
-                                            mod(cF,prestim(os).driftreset) * ...
-                                            prestim(ps).driftpixframe;
-                                        grect = [rectshift 0 ...
-                                            StimSizePix(1)+rectshift StimSizePix(2)];
-                                        drect = [0 0 StimSizePix(1) StimSizePix(2)];
-                                        drect = CenterRectOnPoint(drect,...
-                                            monitor.center(1), monitor.center(2));
+                                        for a = 1:2
+                                            % - get rect
+                                            rectshift = ...
+                                                mod(cF,prestim(ps).driftreset(a)) * ...
+                                                prestim(ps).driftpixframe(a);
+                                            grect = [rectshift 0 ...
+                                                StimSizePix(1)+rectshift StimSizePix(2)];
+                                            drect = [0 0 StimSizePix(1) StimSizePix(2)];
+                                            drect = CenterRectOnPoint(drect,...
+                                                monitor.center(1), monitor.center(2));
 
-                                        % - draw
-                                        Screen('DrawTexture',monitor.w, ...
-                                            prestim(ps).GratText0, ...
-                                            grect,drect,...
-                                            prestim(ps).orient(psOris(fb+1,cF+1)));
-                                        Screen('DrawTexture', monitor.w, ....
-                                            StimMask, [], drect, []);
-
-                                    case 'dots'
-                                        % - first frame
-                                        if cF == 0
-                                            % locations
-                                            prestim(ps).nDots = round(...
-                                                prestim(ps).dotdensity * ...
-                                                trialtype(T).stimsize(1) * ...
-                                                trialtype(T).stimsize(2));
-                                            prestim(ps).dotfb(fb+1).xy = [...
-                                                round(- StimSizePix(1)/2 + ...
-                                                rand(1,prestim(ps).nDots).*StimSizePix(1)); ...
-                                                round(- StimSizePix(2)/2 + ...
-                                                rand(1,prestim(ps).nDots).*StimSizePix(1))];
-                                            % colors
-                                            if ~isempty(prestim(ps).color)
-                                                prestim(ps).dotcol = prestim(ps).color;
-                                            else
-                                                if prestim(ps).contrastbin
-                                                    prestim(ps).dotcol = 0.5 + ...
-                                                        (round(rand(1,prestim(ps).nDots)).*prestim(ps).contrast) - ...
-                                                        prestim(ps).contrast/2;
-                                                else
-                                                    prestim(ps).dotcol = 0.5 + ...
-                                                        (rand(1,prestim(ps).nDots).*prestim(ps).contrast) - ...
-                                                        prestim(ps).contrast/2;
-                                                end
-                                            end
-                                            % dot age
-                                            prestim(ps).dotage = round(rand(1,prestim(ps).nDots).*...
-                                                prestim(ps).dotlifetime);
-                                        else
-                                            % - move
-                                            % turn orientation into xy vector
-                                            prestim(ps).driftpixframeXY = [...
-                                                sind(psOris(fb+1,cF+1))* prestim(ps).driftpixframe ...
-                                                cosd(psOris(fb+1,cF+1))* prestim(ps).driftpixframe];
-
-                                            for a = 1:2
-                                                prestim(ps).dotfb(fb+1).xy(a,:) = prestim(ps).dotfb(fb+1).xy(a,:) + ...
-                                                    prestim(ps).driftpixframeXY(a);
-                                                oof = prestim(ps).dotfb(fb+1).xy(a,:) > ...
-                                                    round(StimSizePix(a)/2);
-                                                prestim(ps).dotfb(fb+1).xy(a,oof) = prestim(ps).dotfb(fb+1).xy(a,oof) - ...
-                                                    round(StimSizePix(a)/2);
-                                                oof = prestim(ps).dotfb(fb+1).xy(a,:) < ...
-                                                    round(-StimSizePix(a)/2);
-                                                prestim(ps).dotfb(fb+1).xy(a,oof) = prestim(ps).dotfb(fb+1).xy(a,oof) + ...
-                                                    round(StimSizePix(a)/2);
-                                            end
-
-                                            prestim(ps).dotage = prestim(ps).dotage+1;
-                                            if ~isempty(prestim(ps).dotlifetime)
-                                                dd = prestim(ps).dotage > prestim(ps).dotlifetime;
-                                                prestim(ps).dotage(dd) = prestim(ps).dotage(dd)-...
-                                                    prestim(ps).dotlifetime;
-                                                % new locations for 'dead dots'
-                                                newdotsxy = [...
-                                                    round(-StimSizePix(1)/2 + ...
-                                                    rand(1,prestim(ps).nDots).*StimSizePix(1)); ...
-                                                    round(- StimSizePix(2)/2 + ...
-                                                    rand(1,prestim(ps).nDots).*StimSizePix(1))];
-                                                prestim(ps).dotfb(fb+1).xy(:,dd) = newdotsxy(:,dd);
-                                            end
-                                        end
-                                        % - draw
-                                        Screen('DrawDots',monitor.w,...
-                                            prestim(ps).dotfb(fb+1).xy, prestim(ps).dotsizepix, ...
-                                            prestim(ps).dotcol,monitor.center,0)
-                                        Screen('DrawTexture', monitor.w, ....
-                                            StimMask, [], drect, []);
-
-                                end
-                            case'exogenous'
-                                switch prestim(ps).type
-                                    case 'grating'
-                                        % - get rect
-                                        rectshift = ...
-                                            mod(cF,prestim(os).driftreset) * ...
-                                            prestim(ps).driftpixframe;
-                                        grect = [rectshift 0 ...
-                                            StimSizePix(1)+rectshift StimSizePix(2)];
-                                        drect = [0 0 StimSizePix(1) StimSizePix(2)];
-                                        drect = CenterRectOnPoint(drect,...
-                                            monitor.center(1), monitor.center(2));
-
-                                        % - draw
-                                        if f >= transframes(1) && f <= transframes(2)
-                                            Screen('DrawTexture',monitor.w, ...
-                                                prestim(ps).GratText1, ...
-                                                grect,drect,...
-                                                prestim(ps).orient(psOris(fb+1,cF+1)));
-                                        else
+                                            % - draw
                                             Screen('DrawTexture',monitor.w, ...
                                                 prestim(ps).GratText0, ...
                                                 grect,drect,...
-                                                prestim(ps).orient(psOris(fb+1,cF+1)));
+                                                psOris(a,cF+1),...
+                                                [],0.5);
+                                            Screen('DrawTexture', monitor.w, ....
+                                                StimMask, [], drect, psOris(a,cF+1));
                                         end
-                                        Screen('DrawTexture', monitor.w, ....
-                                            StimMask, [], drect, []);
                                     case 'dots'
-                                        % - first frame
-                                        if cF == 0
-                                            % locations
-                                            prestim(ps).nDots = round(...
-                                                prestim(ps).dotdensity * ...
-                                                trialtype(T).stimsize(1) * ...
-                                                trialtype(T).stimsize(2));
-                                            prestim(ps).dotfb(fb+1).xy = [...
-                                                round(- StimSizePix(1)/2 + ...
-                                                rand(1,prestim(ps).nDots).*StimSizePix(1)); ...
-                                                round(- StimSizePix(2)/2 + ...
-                                                rand(1,prestim(ps).nDots).*StimSizePix(1))];
-                                            % colors
-                                            if ~isempty(prestim(ps).color)
-                                                prestim(ps).dotcol = prestim(ps).color;
-                                            else
-                                                if prestim(ps).contrastbin
-                                                    prestim(ps).dotcol = 0.5 + ...
-                                                        (round(rand(1,prestim(ps).nDots)).*prestim(ps).contrast) - ...
-                                                        prestim(ps).contrast/2;
-                                                else
-                                                    prestim(ps).dotcol = 0.5 + ...
-                                                        (rand(1,prestim(ps).nDots).*prestim(ps).contrast) - ...
-                                                        prestim(ps).contrast/2;
-                                                end
-                                            end
-                                            % dot age
-                                            prestim(ps).dotage = round(rand(1,prestim(ps).nDots).*...
-                                                prestim(ps).dotlifetime);
-                                        else
-                                            % - move
-                                            % turn orientation into xy vector
-                                            for a = 1:2
-                                                prestim(ps).dotfb(fb+1).xy(a,:) = prestim(ps).dotfb(fb+1).xy(a,:) + ...
-                                                    prestim(ps).driftpixframe(a);
-                                                oof = prestim(ps).dotfb(fb+1).xy(a,:) > ...
-                                                    round(StimSizePix(a)/2);
-                                                prestim(ps).dotfb(fb+1).xy(a,oof) = prestim(ps).dotfb(fb+1).xy(a,oof) - ...
-                                                    round(StimSizePix(a)/2);
-                                                oof = prestim(ps).dotfb(fb+1).xy(a,:) < ...
-                                                    round(-StimSizePix(a)/2);
-                                                prestim(ps).dotfb(fb+1).xy(a,oof) = prestim(ps).dotfb(fb+1).xy(a,oof) + ...
-                                                    round(StimSizePix(a)/2);
-                                            end
-
-                                            prestim(ps).dotage = prestim(ps).dotage+1;
-                                            if ~isempty(prestim(ps).dotlifetime)
-                                                dd = prestim(ps).dotage > prestim(ps).dotlifetime;
-                                                prestim(ps).dotage(dd) = prestim(ps).dotage(dd)-...
-                                                    prestim(ps).dotlifetime;
-                                                % new locations for 'dead dots'
-                                                newdotsxy = [...
-                                                    round(-StimSizePix(1)/2 + ...
+                                        for a=1:2
+                                            % - first frame
+                                            if cF == 0
+                                                % locations
+                                                prestim(ps).nDots = round(...
+                                                    prestim(ps).dotdensity * ...
+                                                    trialtype(T).stimsize(1) * ...
+                                                    trialtype(T).stimsize(2));
+                                                prestim(ps).dot.xy{a} = [...
+                                                    round(- StimSizePix(1)/2 + ...
                                                     rand(1,prestim(ps).nDots).*StimSizePix(1)); ...
                                                     round(- StimSizePix(2)/2 + ...
                                                     rand(1,prestim(ps).nDots).*StimSizePix(1))];
-                                                prestim(ps).dotfb(fb+1).xy(:,dd) = newdotsxy(:,dd);
+                                                
+                                                % colors
+                                                if ~isempty(prestim(ps).color)
+                                                    prestim(ps).dotcol = prestim(ps).color(a,:);
+                                                    prestim(ps).dotcols{a} = prestim(ps).dotcol;
+                                                else
+                                                    if prestim(ps).contrastbin
+                                                        prestim(ps).dotcol(a,:) = 0.5 + ...
+                                                            (round(rand(1,prestim(ps).nDots)).*prestim(ps).contrast) - ...
+                                                            prestim(ps).contrast/2;
+                                                    else
+                                                        prestim(ps).dotcol(a,:) = 0.5 + ...
+                                                            (rand(1,prestim(ps).nDots).*prestim(ps).contrast) - ...
+                                                            prestim(ps).contrast/2;
+                                                    end
+                                                    prestim(ps).dotcols{a} = [...
+                                                        prestim(ps).dotcol(a,:);...
+                                                        prestim(ps).dotcol(a,:);...
+                                                        prestim(ps).dotcol(a,:)];
+                                                end
+                                                % dot age
+                                                prestim(ps).dotage(a,:) = round(rand(1,prestim(ps).nDots).*...
+                                                    prestim(ps).dotlifetime);
+                                                
+                                            else
+                                                % - move
+                                                prestim(ps).driftpixframeXY = [...
+                                                    sind(psOris(a,cF+1)).* prestim(ps).driftpixframe(a) ...
+                                                    cosd(psOris(a,cF+1)).* prestim(ps).driftpixframe(a)];
+                                                
+                                                for d=1:2
+                                                    prestim(ps).dot.xy{a}(d,:) = ...
+                                                        prestim(ps).dot.xy{a}(d,:) + prestim(ps).driftpixframeXY(d);
+                                                    oof = prestim(ps).dot.xy{a}(d,:) > ...
+                                                        round(StimSizePix(d)/2);
+                                                    prestim(ps).dot.xy{a}(d,oof) = prestim(ps).dot.xy{a}(d,oof) - ...
+                                                        round(StimSizePix(d)/2);
+                                                    oof = prestim(ps).dot.xy{a}(d,:) < ...
+                                                        round(-StimSizePix(d)/2);
+                                                    prestim(ps).dot.xy{a}(d,oof) = prestim(ps).dot.xy{a}(d,oof) + ...
+                                                        round(StimSizePix(d)/2);
+                                                end
+
+                                                prestim(ps).dotage(a,:) = prestim(ps).dotage(a,:)+1;
+                                                if ~isempty(prestim(ps).dotlifetime)
+                                                    dd = prestim(ps).dotage(a,:) > prestim(ps).dotlifetime;
+                                                    prestim(ps).dotage(a,dd) = prestim(ps).dotage(a,dd)-...
+                                                        prestim(ps).dotlifetime;
+                                                    % new locations for 'dead dots'
+                                                    newdotsxy = [...
+                                                        round(-StimSizePix(1)/2 + ...
+                                                        rand(1,prestim(ps).nDots).*StimSizePix(1)); ...
+                                                        round(- StimSizePix(2)/2 + ...
+                                                        rand(1,prestim(ps).nDots).*StimSizePix(1))];
+                                                    prestim(ps).dot.xy{a}(1,dd) = newdotsxy(1,dd);
+                                                    prestim(ps).dot.xy{a}(2,dd) = newdotsxy(2,dd);
+                                                end
+                                            end
+
+                                            % - draw
+                                            Screen('DrawDots',monitor.w,...
+                                                prestim(ps).dot.xy{a}, prestim(ps).dotsizepix, ...
+                                                prestim(ps).dotcols{a},monitor.center,1);
+                                            
+                                        end
+                                        drect = [0 0 StimSizePix(1)+10 StimSizePix(2)+10];
+                                        drect = CenterRectOnPoint(drect,...
+                                            monitor.center(1), monitor.center(2));
+                                        Screen('DrawTexture', monitor.w, ....
+                                            StimMask, [], drect, []);
+                                end
+                            case 'exogenous'
+                                switch prestim(ps).type
+                                    case 'grating'
+                                        for a=1:2
+                                            % - get rect
+                                            rectshift = ...
+                                                mod(cF,prestim(ps).driftreset(a)).* ...
+                                                prestim(ps).driftpixframe(a);
+                                            grect = [rectshift 0 ...
+                                                StimSizePix(1)+rectshift StimSizePix(2)];
+                                            drect = [0 0 StimSizePix(1) StimSizePix(2)];
+                                            drect = CenterRectOnPoint(drect,...
+                                                monitor.center(1), monitor.center(2));
+                                            % - draw
+                                            if f >= transframes(1) && f <= transframes(2) && ...
+                                                    a == prestim(ps).transient.stim
+                                                Screen('DrawTexture',monitor.w, ...
+                                                    prestim(ps).GratText1, ...
+                                                    grect,drect,...
+                                                    prestim(ps).orient(a),...
+                                                    [],0.5);
+                                            else
+                                                Screen('DrawTexture',monitor.w, ...
+                                                    prestim(ps).GratText0, ...
+                                                    grect,drect,...
+                                                    prestim(ps).orient(a),...
+                                                    [],0.5);
+                                            end
+                                            Screen('DrawTexture', monitor.w, ....
+                                                StimMask, [], drect, prestim(ps).orient(a));
+                                        end
+                                    case 'dots'
+                                        for a=1:2
+                                            % - first frame
+                                            if cF == 0
+                                                % locations
+                                                prestim(ps).nDots = round(...
+                                                    prestim(ps).dotdensity * ...
+                                                    trialtype(T).stimsize(1) * ...
+                                                    trialtype(T).stimsize(2));
+                                                prestim(ps).dot.xy{a} = [...
+                                                    round(- StimSizePix(1)/2 + ...
+                                                    rand(1,prestim(ps).nDots).*StimSizePix(1)); ...
+                                                    round(- StimSizePix(2)/2 + ...
+                                                    rand(1,prestim(ps).nDots).*StimSizePix(1))];
+
+                                                % colors
+                                                if ~isempty(prestim(ps).color)
+                                                    prestim(ps).dotcol = prestim(ps).color(a,:);
+                                                    prestim(ps).dotcols{a} = prestim(ps).dotcol;
+                                                    prestim(ps).dotcoltrans = prestim(ps).color(a,:)+...
+                                                        prestim(ps).transient.contrastincr;
+                                                    prestim(ps).dotcolstrans{a} = prestim(ps).dotcoltrans;
+                                                else
+                                                    if prestim(ps).contrastbin
+                                                        prestim(ps).dotcol(a,:) = 0.5 + ...
+                                                            (round(rand(1,prestim(ps).nDots)).*prestim(ps).contrast) - ...
+                                                            prestim(ps).contrast/2;
+                                                        coltrans = ...
+                                                            prestim(ps).contrast+prestim(ps).transient.contrastincr;
+                                                        prestim(ps).dotcoltrans(a,:) = 0.5 + ...
+                                                            (round(rand(1,prestim(ps).nDots)).*coltrans) - ...
+                                                            coltrans/2;
+                                                    else
+                                                        prestim(ps).dotcol(a,:) = 0.5 + ...
+                                                            (rand(1,prestim(ps).nDots).*prestim(ps).contrast) - ...
+                                                            prestim(ps).contrast/2;
+                                                        coltrans = ...
+                                                            prestim(ps).contrast+prestim(ps).transient.contrastincr;
+                                                        prestim(ps).dotcoltrans(a,:) = 0.5 + ...
+                                                            (rand(1,prestim(ps).nDots).*coltrans) - ...
+                                                            coltrans/2;
+
+                                                        prestim(ps).dotcols{a} = [...
+                                                            prestim(ps).dotcol(a,:);...
+                                                            prestim(ps).dotcol(a,:);...
+                                                            prestim(ps).dotcol(a,:)];
+                                                        prestim(ps).dotcolstrans{a} = [...
+                                                            prestim(ps).dotcoltrans(a,:);...
+                                                            prestim(ps).dotcoltrans(a,:);...
+                                                            prestim(ps).dotcoltrans(a,:)];
+                                                    end
+                                                end
+                                                % dot age
+                                                prestim(ps).dotage(a,:) = round(rand(1,prestim(ps).nDots).*...
+                                                    prestim(ps).dotlifetime);
+                                            else
+                                                % - move
+                                                for d=1:2
+                                                    prestim(ps).dot.xy{a}(d,:) = ...
+                                                        prestim(ps).dot.xy{a}(d,:) + prestim(ps).driftpixframe(a,d);
+                                                    oof = prestim(ps).dot.xy{a}(d,:) > ...
+                                                        round(StimSizePix(d)/2);
+                                                    prestim(ps).dot.xy{a}(d,oof) = prestim(ps).dot.xy{a}(d,oof) - ...
+                                                        round(StimSizePix(d)/2);
+                                                    oof = prestim(ps).dot.xy{a}(d,:) < ...
+                                                        round(-StimSizePix(d)/2);
+                                                    prestim(ps).dot.xy{a}(d,oof) = prestim(ps).dot.xy{a}(d,oof) + ...
+                                                        round(StimSizePix(d)/2);
+                                                end
+
+
+                                                prestim(ps).dotage(a,:) = prestim(ps).dotage(a,:)+1;
+                                                if ~isempty(prestim(ps).dotlifetime)
+                                                    dd = prestim(ps).dotage(a,:) > prestim(ps).dotlifetime;
+                                                    prestim(ps).dotage(a,dd) = prestim(ps).dotage(a,dd)-...
+                                                        prestim(ps).dotlifetime;
+                                                    % new locations for 'dead dots'
+                                                    newdotsxy = [...
+                                                        round(-StimSizePix(1)/2 + ...
+                                                        rand(1,prestim(ps).nDots).*StimSizePix(1)); ...
+                                                        round(- StimSizePix(2)/2 + ...
+                                                        rand(1,prestim(ps).nDots).*StimSizePix(1))];
+                                                    prestim(ps).dot.xy{a}(1,dd) = newdotsxy(1,dd);
+                                                    prestim(ps).dot.xy{a}(2,dd) = newdotsxy(2,dd);
+                                                end
+                                            end
+
+                                            % - draw
+                                            if f >= transframes(1) && f <= transframes(2) && ...
+                                                    a == prestim(ps).transient.stim
+                                                %fprintf('drawing transient\n')
+                                                Screen('DrawDots',monitor.w,...
+                                                    prestim(ps).dot.xy{a}, prestim(ps).dotsizepix, ...
+                                                    prestim(ps).dotcolstrans{a},monitor.center,1);
+                                            else
+                                                Screen('DrawDots',monitor.w,...
+                                                    prestim(ps).dot.xy{a}, prestim(ps).dotsizepix, ...
+                                                    prestim(ps).dotcols{a},...
+                                                    monitor.center,1);
                                             end
                                         end
-                                        % - draw
-                                        if f >= transframes(1) && f <= transframes(2)
-                                            Screen('DrawDots',monitor.w,...
-                                                prestim(ps).dotfb(fb+1).xy, prestim(ps).dotsizepix, ...
-                                                prestim(ps).dotcol,monitor.center,0)
-                                        else
-                                            Screen('DrawDots',monitor.w,...
-                                                prestim(ps).dotfb(fb+1).xy, prestim(ps).dotsizepix, ...
-                                                prestim(ps).dotcol+prestim(ps).transient.contrastincr,...
-                                                monitor.center,0)
-                                        end
+                                        drect = [0 0 StimSizePix(1)+10 StimSizePix(2)+10];
+                                        drect = CenterRectOnPoint(drect,...
+                                            monitor.center(1), monitor.center(2));
                                         Screen('DrawTexture', monitor.w, ....
                                             StimMask, [], drect, []);
                                 end
                         end
-                    end
+                        
 
-                    % draw the alignment frame
-                    for fb = [0 1]
+                        % draw the alignment frame
                         DrawAlignFrame(monitor, fb, bg);
-                    end
 
-                    % fixation dot
-                    for fb = [0 1]
-                        Screen('SelectStereoDrawBuffer', monitor.w, fb);
+                        % fixation dot
                         Screen('FillOval', monitor.w, fix.color, fix.rect);
                     end
                     Screen('DrawingFinished',monitor.w);
                     vbl = Screen('Flip', monitor.w, vbl+0.9*monitor.FrameDur);
-                    PreStimT0 = vbl; cF=cF+1;
+                    cF=cF+1; f=f+1;
 
                     if ~PreStimStarted
                         log.ev = [log.ev; {vbl,'PreStimStart',T}];
@@ -725,6 +789,7 @@ try
                             EThndl.sendMessage('PreStimStart',vbl)
                         end
                         PreStimStarted = true;
+                        PreStimT0 = vbl;
                     end
 
                 end
@@ -740,15 +805,20 @@ try
                 end
                 Screen('DrawingFinished',monitor.w);
                 vbl = Screen('Flip', monitor.w);
+
                 % wait for key response
                 RespLogged = false;
                 while  ~RespLogged
                     [KeyIsDown,keys.secs,keys.keyCode] = KbCheck;
-                    if KeyIsDown 
+                    if KeyIsDown
                         keys.LastKey = KbName(find(keys.keyCode)); % Get the name of the pressed key
                         if strcmp(keys.LastKey,keys.resp{1}) || strcmp(keys.LastKey,keys.resp{2})
                             log.ev = [log.ev; {keys.secs,'PreStimResponse',keys.LastKey}];
                             RespLogged = true;
+                        elseif strcmp(keys.LastKey,keys.esc)
+                            RespLogged = true;
+                            StopExp = true;
+                            break;
                         end
                     end
                 end
@@ -824,7 +894,7 @@ try
                                 grect,drect,...
                                 stim(ss).orient);
                             Screen('DrawTexture', monitor.w, ....
-                                StimMask, [], drect, []);
+                                StimMask, [], drect, stim(ss).orient);
                         case 'dots'
                             % - first frame
                             if cF == 0
@@ -891,8 +961,11 @@ try
                             Screen('DrawDots',monitor.w,...
                                 stim(ss).dotfb(fb+1).xy, stim(ss).dotsizepix, ...
                                 stim(ss).dotcol,monitor.center,1);
-                            % Screen('DrawTexture', monitor.w, ....
-                            %     StimMask, [], drect, []);
+                            drect = [0 0 StimSizePix(1)+10 StimSizePix(2)+10];
+                            drect = CenterRectOnPoint(drect,...
+                                monitor.center(1), monitor.center(2));
+                            Screen('DrawTexture', monitor.w, ....
+                                StimMask, [], drect, []);
                         case 'image'
                             drect = [0 0 StimSizePix(1) StimSizePix(2)];
                             drect = CenterRectOnPoint(drect,...
@@ -968,9 +1041,12 @@ try
                                     % - draw
                                     Screen('DrawDots',monitor.w,...
                                         stim(ss).overlay.dotfb(fb+1).xy, stim(ss).overlay.dotsizepix, ...
-                                        stim(ss).overlay.dotcol,monitor.center,0)
-                                    % Screen('DrawTexture', monitor.w, ....
-                                    %     StimMask, [], drect, []);
+                                        stim(ss).overlay.dotcol,monitor.center,1)
+                                    drect = [0 0 StimSizePix(1)+10 StimSizePix(2)+10];
+                                    drect = CenterRectOnPoint(drect,...
+                                        monitor.center(1), monitor.center(2));
+                                    Screen('DrawTexture', monitor.w, ....
+                                        StimMask, [], drect, []);
                                 case 'lines'
                                     if cF == 0 % first frame
                                         switch stim(ss).overlay.orientation
@@ -984,7 +1060,7 @@ try
                                                 linexy(1,2:2:end) = StimSizePix(1)/2;
                                                 linexy(2,1:2:end) = -StimSizePix(2)/2 : ...
                                                     StimSizePix(2)/stim(ss).overlay.nLines : ...
-                                                    StimSizePix(2)/2;
+                                                    StimSizePix(2)/2 - StimSizePix(2)/stim(ss).overlay.nLines;
                                                 linexy(2,2:2:end) = linexy(2,1:2:end);
 
                                             case 'vertical'
@@ -997,7 +1073,7 @@ try
                                                 linexy(2,2:2:end) = StimSizePix(2)/2;
                                                 linexy(1,1:2:end) = -StimSizePix(1)/2 : ...
                                                     StimSizePix(1)/stim(ss).overlay.nLines : ...
-                                                    StimSizePix(1)/2;
+                                                    StimSizePix(1)/2 - StimSizePix(1)/stim(ss).overlay.nLines;
                                                 linexy(1,2:2:end) = linexy(1,1:2:end);
                                         end
                                         stim(ss).overlay.linecol = [stim(ss).overlay.color ...
@@ -1017,9 +1093,12 @@ try
                                     % - draw
                                     Screen('DrawLines',monitor.w,...
                                         linexy, stim(ss).overlay.linewidthpix, ...
-                                        stim(ss).overlay.linecol,monitor.center,0)
-                                    % Screen('DrawTexture', monitor.w, ....
-                                    %     StimMask, [], drect, []);
+                                        stim(ss).overlay.linecol,monitor.center,0);
+                                    drect = [0 0 StimSizePix(1)+10 StimSizePix(2)+10];
+                                    drect = CenterRectOnPoint(drect,...
+                                        monitor.center(1), monitor.center(2));
+                                    Screen('DrawTexture', monitor.w, ....
+                                        StimMask, [], drect, []);
                             end
                     end
                 end
@@ -1042,7 +1121,7 @@ try
                 vbl = Screen('Flip', monitor.w, vbl+0.9*monitor.FrameDur);
                 cF= cF + 1; % current frame update
                 %fprintf('flip reached\n')
-                
+
                 if ~StimStarted
                     % log
                     log.ev = [log.ev; {vbl,'StimStart',T}];
@@ -1115,7 +1194,7 @@ try
     settings.fix = fix;
     settings.prestim = prestim;
     settings.stim = stim;
-    settings.trialtime = trialtime; 
+    settings.trialtime = trialtime;
     settings.trialtype = trialtype;
     settings.block = block;
     settings.expt = expt;
@@ -1143,7 +1222,7 @@ try
     end
     Screen('DrawingFinished', monitor.w);
     vbl = Screen('Flip', monitor.w);
-    WaitSecs(2); % pause a few seconds
+    WaitSecs(expt.thankdur); % pause a few seconds
     Screen('LoadNormalizedGammaTable', monitor.w, monitor.OLD_Gamtable);
     sca; ListenChar(); ShowCursor;
 catch
@@ -1226,12 +1305,16 @@ end
             keys.LogNewKey = true;
         elseif keys.KeyIsDown && keys.KeyWasDown % still holding key
             if strcmp(keys.LastKey, KbName(find(keys.keyCode)))
-                keys.LastKey = KbName(find(keys.keyCode));
-                keys.LogNewKey = true;
+                if keys.LastKey ~= KbName(find(keys.keyCode))
+                    keys.LastKey = KbName(find(keys.keyCode));
+                    keys.LogNewKey = true;
+                else
+                    keys.LogNewKey = false;
+                end
             end
         elseif ~keys.KeyIsDown && keys.KeyWasDown % stop holding key
             keys.LastKey = 'none';
-            keys.LogNewKey = true;
+            keys.LogNewKey = false;
             keys.KeyWasDown = false;
         else
             keys.LogNewKey = false;

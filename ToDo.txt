@@ -1,11 +1,11 @@
 @Anywhere
-- check mask as it seems to be wrong
+X - check mask as it seems to be wrong
     - DriftDemo2 explains this
-- check grating creation and drift reset
+X - check grating creation and drift reset
     - again DriftDemo2 shows an efficient method
-- check the overlays for the image stimuli
+X - check the overlays for the image stimuli
 - check key-press logging
-- check prestim appearances
+X - check prestim appearances
 
 @UU
 - check eyetracker calibration
