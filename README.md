@@ -58,5 +58,5 @@ In **stim** the stimuli can be different for the two eyes to evoke binocular riv
   - drifting dots
 See `settings_def.m` for details.
 
-All settings and responses will automatically be saved in a log-file with the timestamp of when the experiment was run. THis file will be in a folder that you specify in the settings file.
+All settings and responses will automatically be saved in a log-file with the timestamp of when the experiment was run. This file will be in a folder that you specify in the settings file.
 

@@ -8,36 +8,42 @@ function BR_UCU(settings_file)
 % Chris Klink p.c.klink@uu.nl
 
 %% Process arguments ------
-if nargin<1
+if nargin<1 % no arguments provided
     settings_file = 'settings_def'; % the default
 end
 log.settings_file = settings_file; % log the file name
 
 % Debug mode allows subscreen stim display
+% set this to 'NoDebug' when running the experiments
 % NoDebug / UU / CKHOME / CKNIN
 DebugMode = 'NoDebug';
 
-% load settings
-monitor = []; eyetracker = [];
-sound = []; keys = [];
+% load settings ---
+% variables need to be preallocated when they come from the settings file
+monitor = []; eyetracker = []; sound = []; keys = [];
 bg = []; fix = []; prestim = []; stim = [];
 trialtime = []; trialtype = [];
 block = []; expt = [];
+% get the info from the settings file
 run(settings_file)
+% get the location of this file for relative filepaths
 [RunPath,~,~] = fileparts(mfilename('fullpath'));
 
 % log set-up --
+% get a timestamp
 cdt = datetime('now', 'Format', 'yyyyMMdd_HHmm');
 log.Label = datestr(cdt, 'yyyymmdd_HHMM'); %#ok<*DATST>
+% create a folder for the log files
 [~,~] = mkdir(fullfile(RunPath, log.fld, log.Label));
 
+% get subject information
 if strcmp(DebugMode, 'NoDebug')
     % Get registration info & check against existing data    % Get subject info
     log.Subject = input('Subject initials: ','s');
     log.Gender = input('Gender (m/f/x): ','s');
     log.Age = input('Age: ','s');
     log.Handedness = input('Left(L)/Right(R) handed: ','s');
-else
+else % when running in debug mode use some dummy values
     log.Subject = 'TEST';
     log.Gender = 'x';
     log.Age = 0;
@@ -51,7 +57,7 @@ if eyetracker.do && eyetracker.calibrate % alternatively do this with a separate
         calibrateTobii(eyetracker, log); % run calibration
         SetMonitors('extended') % set monitors in extended mode
     catch
-        fprintf('ERROR doing eyetracker calibration\n')
+        fprintf('ERROR doing eyetracker calibration\n'); % we'll go here if something goes wrong
     end
 end
 
@@ -64,20 +70,33 @@ try
     Screen('Preference', 'VisualDebuglevel', 0);
     Screen('Preference','SkipSyncTests',1);
 
-    %Do some basic initializing
+    % Do some basic initializing
     PsychDefaultSetup(2); HideCursor;
     ListenChar(2); % silence keyboard for matlab
 
-    % Get screen info
+    % Get screen info --
     scr = Screen('screens'); % get screen info
     monitor.scr = max(scr); % use the screen with the highest #
+    % for our setup the two monitors form one large screen
+    % using stereomode later on then splits this into a left/right half
+    % that you draw stimuli on independently
 
-    % Gamma Correction to allow intensity in fractions
+    % Gamma Correction to allow intensity in fractions --
+    % Each pixel can have an intensity values specified in 8 bits (0-255)
+    % We have initialized PTB to use relative values 0-1 instead of bit values 0-255
+    % Still, the light intensity of a pixel does not scale linearly with the bit value
+    % so doubling what we put in does not double the output intensity
+    % Here we correct for that and make it linear.
+    % This holds for grey-scale values only.
+    % Gamma correcting color values is a pita because
+    % the RGB also interact making the function very complex
     [monitor.OLD_Gamtable, monitor.dacbits, monitor.reallutsize] = ...
         Screen('ReadNormalizedGammaTable', monitor.scr);
     GamCor = (0:1/255:1).^(1/monitor.gamma);
     Gamtable = [GamCor;GamCor;GamCor]';
     Screen('LoadNormalizedGammaTable',monitor.scr, Gamtable);
+    % we save the uncorrected gamma-table and put it back at the end so the screen looks normal again
+    % gamma correction depends on monitor settings: DO NOT CHANGE BRIGHTNESS OR CONTRAST
 
     % Get the screen size in pixels
     [monitor.PixWidth, monitor.PixHeight] = ...
@@ -86,11 +105,14 @@ try
     [monitor.MmWidth, monitor.MmHeight] = ...
         Screen('DisplaySize',monitor.scr);
 
-    % Define conversion factors
-    monitor.Mm2Pix = monitor.PixWidth/monitor.MmWidth;
+    % Define conversion factors between these values
+    monitor.Mm2Pix = monitor.PixWidth/monitor.MmWidth; % convert mm to pixels
     monitor.Deg2Pix = (tand(1)*monitor.distance)*...
-        monitor.PixWidth/monitor.MmWidth;
+        monitor.PixWidth/monitor.MmWidth; % convert degrees visual angles to pixels on the screen
 
+    % Define a stimulus window to draw in
+    % this defines a rectangle [upperleft-X upperleft-Y lowerreight-X lowerright-Y]
+    % in pixels, start counting from the top left corner of the screen
     switch DebugMode
         case 'NoDebug'
             WindowRect = []; %fullscreen
@@ -102,78 +124,81 @@ try
             WindowRect = [1920 0 1920+1500 750]; %#ok<*UNRCH> %debug
     end
 
-    % Open a window
-    PsychImaging('PrepareConfiguration');
-    if monitor.fliphorizontal
-        PsychImaging('AddTask','AllViews','FlipHorizontal'); % mirror everything
+    % Open a window in this 'screen'
+    PsychImaging('PrepareConfiguration'); % this allows structural handling of video like mirroring
+    if monitor.fliphorizontal % if this is set 'true' in the settings
+        PsychImaging('AddTask','AllViews','FlipHorizontal'); % mirror all video output horizontally
     end
     [monitor.w, monitor.wrect] = ...
         PsychImaging('OpenWindow', monitor.scr, bg.color, ...
-        WindowRect, [], 2, monitor.stereomode); %#ok<*NODEF>
+        WindowRect, [], 2, monitor.stereomode); %#ok<*NODEF> % open the actual window
 
     % Get the center of screen coordinates
     monitor.center = [monitor.wrect(3)/2 monitor.wrect(4)/2];
 
-    % Define blend function for anti-aliassing
+    % Define blend function for anti-aliassing (creates smooth shapes)
     [monitor.sourceFactorOld, monitor.destinationFactorOld, ...
         monitor.colorMaskOld] = Screen('BlendFunction', monitor.w, ...
         GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     % Initialize text options
     Screen('Textfont', monitor.w, 'Arial');
-    Screen('TextSize', monitor.w, 20);
-    Screen('TextStyle', monitor.w, 0);
+    Screen('TextSize', monitor.w, 20); Screen('TextStyle', monitor.w, 0);
 
     % Maximum useable priorityLevel on this system:
     priorityLevel = MaxPriority(monitor.w); Priority(priorityLevel);
 
     % Get the frame duration and refreshrate
+    % NB! we measure it from the hardware instead of hardcoding it
     monitor.FrameDur = Screen('GetFlipInterval', monitor.w);
     monitor.refreshRate = round(Screen('NominalFrameRate', monitor.scr));
 
-    % Log init. Create a table for events.
+    % Log initiation. Create a table for events.
     log.ev = array2table(nan(0,3),'VariableNames',{'t','type','info'});
+    % three colums 1) timestamp, 2) label, 3) extra information
 
     % Eyetracker init --
-    if eyetracker.do
+    if eyetracker.do % the settings file determines whether we use an eyetracker or not
         run(fullfile(eyetracker.toolboxfld,'addTittaToPath')); % add toolbox to path
         settings = Titta.getDefaults(eyetracker.type); % specify which eyetracker
         settings.debugMode = false;
-        EThndl = Titta(settings);
+        EThndl = Titta(settings); % load settings
         EThndl.init(); % initiate eyetracker
-        EThndl.buffer.start('gaze'); WaitSecs(.8); % start gazebuffer
-        log.ev = [log.ev; {GetSecs,'EyeStart','GazeBuffer'}]; % log this
+        EThndl.buffer.start('gaze'); WaitSecs(.8); % start gazebuffer and wait a bit for it to start
+        log.ev = [log.ev; {GetSecs,'EyeStart','GazeBuffer'}]; % log this start
     end
 
     % Sound init --
     if sound.recordmic
         % mic device
         reqlatencyclass = 2;
-        InitializePsychSound(double(reqlatencyclass > 1));
+        InitializePsychSound(double(reqlatencyclass > 1)); % initialize the sound support
         hmic = PsychPortAudio('Open', sound.mic.device, 2, ...
-            reqlatencyclass, [], 2);
-        snd = PsychPortAudio('GetStatus', hmic);
+            reqlatencyclass, [], 2); % get a handle to a recording device
+        snd = PsychPortAudio('GetStatus', hmic); % get some specs from the mic
         sndfreq = snd.SampleRate;
         PsychPortAudio('GetAudioData', hmic, 10);
 
         % play device
-        [y, wavfreq] = psychwavread(sound.beepfile);
-        hplay = PsychPortAudio('Open', [], 1, 0, wavfreq, 2);
-        wavedata = [y';y'];
-        nrchannels = 2;
-        PsychPortAudio('FillBuffer', hplay, wavedata);
+        [y, wavfreq] = psychwavread(sound.beepfile); % read in a sound file
+        hplay = PsychPortAudio('Open', [], 1, 0, wavfreq, 2); % get a handle to a playing device
+        wavedata = [y';y']; nrchannels = 2;
+        PsychPortAudio('FillBuffer', hplay, wavedata); % load the sound into a buffer
     end
 
     %% Prepare stimuli ------
     %% alignment stim --
-    if bg.align.AlignCircles.draw
-        if bg.align.AlignCircles.n > 0
+    % the alignment stimuli are a set of 'bubbles' that are in the same location on both screens
+    % they can facilitate binocular merging
+    if bg.align.AlignCircles.draw % only create them when we need them
+        if bg.align.AlignCircles.n > 0 % only create them if we want to have more than 0
 
-            % random colors within range
+            % random colors within range [greyscale]
             bg.align.AlignCircles.Colors = (bg.align.AlignCircles.ColorRange(2) - ...
                 bg.align.AlignCircles.ColorRange(1)) .* ...
                 rand(1,bg.align.AlignCircles.n) + ...
                 bg.align.AlignCircles.ColorRange(1);
+            % colors need to be RGB so we use the same values three times for greyscale
             bg.align.AlignCircles.Colors = [...
                 bg.align.AlignCircles.Colors; ...
                 bg.align.AlignCircles.Colors; ...
@@ -184,15 +209,17 @@ try
                 bg.align.AlignCircles.SizeRange(1)) .*...
                 rand(1,bg.align.AlignCircles.n) + ...
                 bg.align.AlignCircles.SizeRange(1);
+            % we make them circular so horizontal size and vertical size are the same
             bg.align.AlignCircles.Sizes = [...
                 bg.align.AlignCircles.Sizes;...
                 bg.align.AlignCircles.Sizes];
 
-            % size in pix
+            % size in pix (convert from degrees)
             bg.align.AlignCircles.SizesPix = round(...
                 bg.align.AlignCircles.Sizes .* monitor.Deg2Pix);
 
             % rects
+            % use the sizes to define rectangular areas [TL-X TL-Y BR-X BR-Y]
             bg.align.AlignCircles.Rects = [...
                 zeros(1,size(bg.align.AlignCircles.SizesPix,2)); ...
                 zeros(1,size(bg.align.AlignCircles.SizesPix,2));
@@ -200,6 +227,7 @@ try
                 bg.align.AlignCircles.SizesPix(2,:)];
 
             % locations
+            % the centers of these rectangles
             bg.align.AlignCircles.XY = [...
                 round(rand(1,size(bg.align.AlignCircles.SizesPix,2)).*...
                 (monitor.wrect(3)-monitor.wrect(1)));...
@@ -207,6 +235,7 @@ try
                 (monitor.wrect(4)-monitor.wrect(2)))];
 
             % center rect on points
+            % place the rectangles on the points
             for r = 1: size(bg.align.AlignCircles.Rects,2)
                 bg.align.AlignCircles.Rects(:,r) = ...
                     CenterRectOnPoint(bg.align.AlignCircles.Rects(:,r),...
@@ -215,6 +244,7 @@ try
             end
 
             % open area
+            % free up a central area without bubbles for stimulus presentation
             bg.align.AlignCircles.OpenAreaPix = ...
                 bg.align.AlignCircles.OpenArea.* monitor.Deg2Pix;
             OpenRect = [-bg.align.AlignCircles.OpenAreaPix(1)/2 ...
@@ -235,13 +265,13 @@ try
 
             bg.align.AlignCircles.Rects = bg.align.AlignCircles.Rects(:,keepbubbles);
             bg.align.AlignCircles.Colors = bg.align.AlignCircles.Colors(:,keepbubbles);
-
         end
 
-        fix.sizepix = round(fix.size.*monitor.Deg2Pix);
-        fix.rect = [0 0 fix.sizepix fix.sizepix];
+        % define a fixation dot
+        fix.sizepix = round(fix.size.*monitor.Deg2Pix); % size
+        fix.rect = [0 0 fix.sizepix fix.sizepix]; % rectangle
         fix.rect = CenterRectOnPoint(fix.rect, ...
-            monitor.center(1), monitor.center(2));
+            monitor.center(1), monitor.center(2)); % place it in the center
     end
 
     % Align Crossbars =====================
@@ -251,12 +281,13 @@ try
     % penwidth in pix
     bg.align.Frame.PenWidthPix = round(...
         bg.align.Frame.PenWidth .* monitor.Deg2Pix);
-
+    % there is a maximum for lines and dots that is hardware dependent
     if bg.align.Frame.PenWidthPix > monitor.maxpenwidth
         bg.align.Frame.PenWidthPix = monitor.maxpenwidth;
     end
 
     %% prestim --
+    % prestim are the stimuli used for cueing in the exo/endogenous attention experiments
     if trialtime.PrestimT % only if a prestim phase is set
         for ps = 1:length(prestim)
             switch prestim(ps).type
@@ -271,7 +302,7 @@ try
                     a = cos(angle)*f; b = sin(angle)*f; phase=0;
                     m = sin(a*x+b*y+phase);
                     grattex0 = (0.5+0.5*m*prestim(ps).contrast);
-                    if strcmp(prestim(ps).attentiontype,'exogenous')
+                    if strcmp(prestim(ps).attentiontype,'exogenous') % for exo, also create an increased contrast version
                         grattex1 = (0.5+0.5*m*...
                             (prestim(ps).contrast + prestim(ps).transient.contrastincr));
                     end
@@ -290,7 +321,7 @@ try
                     prestim(ps).driftreset = monitor.refreshRate./...
                         (prestim(ps).sf*prestim(ps).driftspeed); % nframes to full period drift
                 case 'dots'
-                    % do most of this on the fly
+                    % do most of this on the fly later
                     prestim(ps).dotsizepix = round(prestim(ps).dotsize * monitor.Deg2Pix);
                     % speed
                     prestim(ps).driftpixsec = round(...
@@ -303,6 +334,7 @@ try
     end
 
     %% stim --
+    % the main binocular rivalry stimuli
     for ss = 1:length(stim)
         switch stim(ss).type
             case 'grating'
@@ -356,6 +388,7 @@ try
     end
 
     %% dynamics --
+    % define the structure of an eperiment
     if ~expt.blockorder
         expt.blockorder = 1:length(block);
     end
@@ -370,7 +403,6 @@ try
         end
     end
 
-
     %% Run the experiment ------
     StopExp = false;
 
@@ -379,6 +411,7 @@ try
     while b <= length(expt.blocks) && ~StopExp
         B = expt.blocks(b);
         TRIALS = []; TL = block(B).trials;
+        % create a list of trials for the current block
         for rt = 1:block(B).repeattrials
             if block(B).randomizetrials
                 TRIALS = [TRIALS TL(randperm(length(TL)))];
@@ -399,9 +432,9 @@ try
         Screen('DrawingFinished',monitor.w);
         vbl = Screen('Flip', monitor.w);
 
-        log.ev = [log.ev; {vbl,'ExpStart','Instruction'}];
+        log.ev = [log.ev; {vbl,'ExpStart','Instruction'}]; % log
         if eyetracker.do
-            EThndl.sendMessage('ExpStart',vbl)
+            EThndl.sendMessage('ExpStart',vbl); % send message to eyetracker log
         end
 
         % wait for key
@@ -413,12 +446,11 @@ try
 
         for fb = [0 1] % both framebuffers for stereomode
             Screen('SelectStereoDrawBuffer', monitor.w, fb);
-            Screen('FillRect', monitor.w, bg.color, []);
+            Screen('FillRect', monitor.w, bg.color, []); % empty screen with background color
         end
         Screen('DrawingFinished',monitor.w);
         vbl = Screen('Flip', monitor.w);
         pause(0.1) % brief gap with just bg before trial starts
-
 
         %% run the trials
         t=1;
@@ -426,26 +458,26 @@ try
             T = TRIALS(t); log.trial(t).T = T;
 
             %% generic
+            % specify some stimulus-independent features
             StimSizePix = round(trialtype(T).stimsize .* monitor.Deg2Pix);
             bg.align.Frame.SizePix = StimSizePix;
+            % create an oval mask to show the stimulus in
             [mX, mY] = meshgrid(1:StimSizePix(1), 1:StimSizePix(2));
-
             maskcenter = StimSizePix/2;
             maskradius = StimSizePix/2;
             dH = (mX - maskcenter(1)) / maskradius(1);
             dV = (mY- maskcenter(2)) / maskradius(2);
             maskmat = (dH.^2 + dV.^2 <= 1);
             maskbg = ~isnan(maskmat);
-
-            masktext(:,:,1) = maskbg .* bg.color(1);
+            masktext(:,:,1) = maskbg .* bg.color(1); % file the first 3 layers with background color
             masktext(:,:,2) = maskbg .* bg.color(2);
             masktext(:,:,3) = maskbg .* bg.color(3);
-            masktext(:,:,4) = -maskmat+1;
+            masktext(:,:,4) = -maskmat+1; % the fourth laye is an opacity mask that defines transparancy
 
-            StimMask = Screen('MakeTexture', monitor.w, masktext);
+            StimMask = Screen('MakeTexture', monitor.w, masktext); % load the array to texture in video memory
             %fprintf('Mask created\n')
 
-            ps = trialtype(T).prestim;
+            ps = trialtype(T).prestim; % which prestim?
 
             %% FIX ----
             FixT0 = 0; vbl = 0;
@@ -458,9 +490,9 @@ try
             vbl = Screen('Flip', monitor.w);
             FixT0 = vbl;
 
-            log.ev = [log.ev; {vbl,'FixStart','none'}];
+            log.ev = [log.ev; {vbl,'FixStart','none'}]; % log
             if eyetracker.do
-                EThndl.sendMessage('FixStart',vbl)
+                EThndl.sendMessage('FixStart',vbl) % log on eyetracker
             end
 
             while (GetSecs-FixT0) < trialtime.FixT && ~StopExp
@@ -479,12 +511,14 @@ try
 
 
             %% PRESTIM ----
+            % the prestim phase
             if trialtime.PrestimT % only if a prestim phase is set
                 % get a series of orientation for prestim frames
                 switch prestim(ps).attentiontype
                     case 'endogenous'
-                        psOris = CreatePrestimEndoOri(monitor, prestim, ps);
+                        psOris = CreatePrestimEndoOri(monitor, prestim, ps); % create a series of oerientation values
                     case 'exogenous'
+                        % define which videoframes wil show the high contrast stimulus
                         total_fr = round(trialtime.PrestimT*monitor.refreshRate);
                         trans_frw = round(...
                             prestim(ps).transient.timewindow*monitor.refreshRate + total_fr);
@@ -494,6 +528,7 @@ try
                 end
 
                 % instruction screen --
+                % tell your participants what to do
                 for fb = [0 1] % both framebuffers for stereomode
                     % BG
                     DrawBackground(monitor, fb, bg);
@@ -516,6 +551,8 @@ try
 
                 f=1; % framenuber
                 while (vbl - PreStimT0) < trialtime.PrestimT && ~StopExp
+                    % run this for the predetermined duration
+                    % show the stimulus
                     for fb = [0 1]
                         DrawBackground(monitor, fb, bg);
                         switch prestim(ps).attentiontype
@@ -767,17 +804,17 @@ try
                                 end
                         end
                         
-
                         % draw the alignment frame
                         DrawAlignFrame(monitor, fb, bg);
 
-                        % fixation dot
+                        % draw the fixation dot
                         Screen('FillOval', monitor.w, fix.color, fix.rect);
                     end
                     Screen('DrawingFinished',monitor.w);
                     vbl = Screen('Flip', monitor.w, vbl+0.9*monitor.FrameDur);
                     cF=cF+1; f=f+1;
 
+                    % log the start of the prestim period
                     if ~PreStimStarted
                         log.ev = [log.ev; {vbl,'PreStimStart',T}];
                         if eyetracker.do
@@ -819,8 +856,8 @@ try
                 end
             end
 
-
             %% GAP ---
+            % a brief empty screen before the main stimulus starts
             % bg alignment
             for fb = [0 1]
                 DrawBackground(monitor, fb, bg);
@@ -830,6 +867,7 @@ try
             vbl = Screen('Flip', monitor.w);
             GapT0 = vbl;
 
+            % log
             log.ev = [log.ev; {vbl,'GapStart',T}];
             if eyetracker.do
                 EThndl.sendMessage('GapStart',vbl)
@@ -858,6 +896,7 @@ try
 
 
             %% STIM ---
+            % the main stimulus phase
             StimStarted = 0;
             StimT0 = 0; vbl = 0; cF = 0;
             keys.KeyWasDown = false;
@@ -1138,7 +1177,9 @@ try
                 elseif keys.LogNewKey
                     log.ev = [log.ev; {keys.secs,'KeyPress',keys.LastKey}];
                 end
-                % Can we fetch the mic buffer every screen refresh --
+
+                % Can we fetch the mic buffer every screen refresh? --
+                % we may need to time this differently
                 if sound.recordmic
                     % Retrieve pending audio data from the internal buffer
                     audiodata = PsychPortAudio('GetAudioData', hmic);
@@ -1179,6 +1220,7 @@ try
             t=t+1; % next trial
 
             %% ITI ---
+            % intertrial interval
             % bg alignment
             for fb = [0 1]
                 DrawBackground(monitor, fb, bg);
@@ -1248,6 +1290,7 @@ catch
 end
 
 %% Repeating functions
+% these functions are used several times throughout the code
     function DrawBackground(monitor, fb,  bg)
         Screen('SelectStereoDrawBuffer', monitor.w, fb);
         % BG
