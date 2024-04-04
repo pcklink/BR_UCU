@@ -47,7 +47,8 @@ You can specify the following stimuli:
   - have a brief contrast change (exo)
 - Moving dots that
   - change direction (endo)
-  - have a brief contrast change (exo)
+  - have a brief contrast change (exo)    
+  
 Do test this, as some configuration are perceptually a bit weird. Find out what works for your question.
 
 In **stim** the stimuli can be different for the two eyes to evoke binocular rivalry. Do check if the left/right assignment is as planned; the mirror may make things a bit more complex. Here you have even more stimulus options:
