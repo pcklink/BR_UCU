@@ -13,11 +13,6 @@ if nargin<1 % no arguments provided
 end
 log.settings_file = settings_file; % log the file name
 
-% Debug mode allows subscreen stim display
-% set this to 'NoDebug' when running the experiments
-% NoDebug / UU / CKHOME / CKNIN
-DebugMode = 'NoDebug';
-
 % load settings ---
 % variables need to be preallocated when they come from the settings file
 monitor = []; eyetracker = []; sound = []; keys = [];
@@ -28,6 +23,10 @@ block = []; expt = [];
 run(settings_file)
 % get the location of this file for relative filepaths
 [RunPath,~,~] = fileparts(mfilename('fullpath'));
+
+
+% Debug mode allows subscreen stim display
+DebugMode = monitor.DebugMode;
 
 % log set-up --
 % get a timestamp
@@ -174,15 +173,16 @@ try
         reqlatencyclass = 2;
         InitializePsychSound(double(reqlatencyclass > 1)); % initialize the sound support
         hmic = PsychPortAudio('Open', sound.mic.device, 2, ...
-            reqlatencyclass, [], 2); % get a handle to a recording device
+            reqlatencyclass, [], sound.mic.nchan); % get a handle to a recording device
         snd = PsychPortAudio('GetStatus', hmic); % get some specs from the mic
         sndfreq = snd.SampleRate;
         PsychPortAudio('GetAudioData', hmic, 10);
 
         % play device
         [y, wavfreq] = psychwavread(sound.beepfile); % read in a sound file
-        hplay = PsychPortAudio('Open', [], 1, 0, wavfreq, 2); % get a handle to a playing device
-        wavedata = [y';y']; nrchannels = 2;
+        hplay = PsychPortAudio('Open', sound.play.device, 1, ...
+            0, wavfreq, sound.play.nchan); % get a handle to a playing device
+        wavedata = [y';y']; nrchannels = sound.play.nchan;
         PsychPortAudio('FillBuffer', hplay, wavedata); % load the sound into a buffer
     end
 
@@ -432,9 +432,9 @@ try
         Screen('DrawingFinished',monitor.w);
         vbl = Screen('Flip', monitor.w);
 
-        log.ev = [log.ev; {vbl,'ExpStart','Instruction'}]; % log
+        log.ev = [log.ev; {vbl,'BlockStart',b}]; % log
         if eyetracker.do
-            EThndl.sendMessage('ExpStart',vbl); % send message to eyetracker log
+            EThndl.sendMessage('BlockStart',vbl); % send message to eyetracker log
         end
 
         % wait for key
@@ -455,7 +455,7 @@ try
         %% run the trials
         t=1;
         while t <= length(TRIALS) && ~StopExp
-            T = TRIALS(t); log.trial(t).T = T;
+            T = TRIALS(t); log.block(b).trial(t).T = T;
 
             %% generic
             % specify some stimulus-independent features
@@ -490,7 +490,7 @@ try
             vbl = Screen('Flip', monitor.w);
             FixT0 = vbl;
 
-            log.ev = [log.ev; {vbl,'FixStart','none'}]; % log
+            log.ev = [log.ev; {vbl,'FixStart',t}]; % log
             if eyetracker.do
                 EThndl.sendMessage('FixStart',vbl) % log on eyetracker
             end
@@ -1205,16 +1205,21 @@ try
                 audiodata = PsychPortAudio('GetAudioData', hmic);
                 % Attach it to our full sound vector:
                 voicetrack = [voicetrack audiodata];
-                log.trial(t).voicetrack = voicetrack;
-                log.trial(t).voicefile = ['voice_' num2str(t) '.wav'];
+                log.block(b).trial(t).voicetrack = voicetrack;
+                if size(log.block(b).trial(t).voicetrack,1) == 1
+                    log.block(b).trial(t).voicetrack = [...
+                        log.block(b).trial(t).voicetrack;log.block(b).trial(t).voicetrack];
+                end
+                log.block(b).trial(t).voicefile = ...
+                    ['voice_b-' num2str(b,'%03d') '_t-' num2str(t,'%03d') '.wav'];
                 voicetrack = [];
-                % Close the audio device --
-                PsychPortAudio('Close', hmic);
-                PsychPortAudio('Close', hplay);
+                % % Close the audio device --
+                % PsychPortAudio('Close', hmic);
+                % PsychPortAudio('Close', hplay);
                 % Save the sound file to 'sndfile'
-                sndfile = fullfile(RunPath, log.fld, log.Label, log.trial(t).voicefile);
+                sndfile = fullfile(RunPath, log.fld, log.Label, log.block(b).trial(t).voicefile);
                 if ~isempty(sndfile)
-                    psychwavwrite(transpose(voicetrack), sndfreq, 16, sndfile)
+                    psychwavwrite(transpose(log.block(b).trial(t).voicetrack), sndfreq, 16, sndfile)
                 end
             end
             t=t+1; % next trial
@@ -1266,6 +1271,12 @@ try
         fn = ['eyedata_' log.Label]; % create a label
         EThndl.saveData(dat, fullfile(log.fld,log.Label,fn), true); % save
         EThndl.deInit(); % shut down
+    end
+
+    % close the audiodevices
+    if sound.recordmic
+        PsychPortAudio('Close', hmic);
+        PsychPortAudio('Close', hplay);
     end
 
     %% Thanks screen -
