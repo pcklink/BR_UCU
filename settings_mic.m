@@ -31,9 +31,9 @@ eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyet
 sound.recordmic = true; % necessary for verbal reports
 sound.startbeep = true; % you might want to use this as a start marker on the recorded track
 sound.mic.maxsec = []; % infinite if empty
-sound.mic.device = 4; % auto if empty, only necessary if multiple are present
+sound.mic.device = 6; % auto if empty, only necessary if multiple are present
 sound.mic.nchan = 1; % mono or stereo mic
-sound.play.device = 5; % auto if empty, only necessary if multiple are present
+sound.play.device = 0; % auto if empty, only necessary if multiple are present
 sound.play.nchan = 2; % mono or stereo 
 sound.beepfile = 'beep.wav'; % should be in root folder; plays as marker
 

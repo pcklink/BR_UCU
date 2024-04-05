@@ -17,12 +17,12 @@ monitor.distance = 690; % mm distance to screen
 monitor.fliphorizontal = true; % mirror the video buffer to account for stereoscope mirrors
 monitor.stereomode = 4; % 4 = uncrossed screen halves / 5 = crossed screen halves [CHECK THIS!]
 monitor.maxpenwidth = 7; % Graphics card limitation, you can try ti increase, but may get errors
-monitor.DebugMode = 'UU';% Debug mode allows subscreen stim display
+monitor.DebugMode = 'NoDebug';% Debug mode allows subscreen stim display
 % set this to 'NoDebug' when running the experiments
 % NoDebug / UU / CKHOME / CKNIN
 
 % eyetracker ---
-eyetracker.do = true; % using an eyetracker or not
+eyetracker.do = false; % using an eyetracker or not
 eyetracker.type = 'Tobii Pro Fusion'; % which eyetracker
 eyetracker.calibrate = false; % calibration as part of experiment (alternative is to do it separately
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyetracker toolbox
@@ -31,9 +31,9 @@ eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyet
 sound.recordmic = false; % necessary for verbal reports
 sound.startbeep = false; % you might want to use this as a start marker on the recorded track
 sound.mic.maxsec = []; % infinite if empty
-sound.mic.device = 4; % auto if empty, only necessary if multiple are present
+sound.mic.device = 6; % auto if empty, only necessary if multiple are present
 sound.mic.nchan = 1; % mono or stereo mic
-sound.play.device = 5; % auto if empty, only necessary if multiple are present
+sound.play.device = 0; % auto if empty, only necessary if multiple are present
 sound.play.nchan = 2; % mono or stereo 
 sound.beepfile = 'beep.wav'; % should be in root folder; plays as marker
 
@@ -160,7 +160,7 @@ stim(1).driftspeed = 1.5; % deg/s
 stim(2).type = 'grating'; % stimulus type
 stim(2).sf = 2; % spatial frequency in cycles/deg
 stim(2).contrast = 1; % contrast 0-1
-stim(2).orient = -45; % degrees clockwise
+stim(2).orient = -0; % degrees clockwise
 stim(2).driftspeed = 1.5; % deg/s 
 
 stim(3).type = 'dots'; % stimulus type
