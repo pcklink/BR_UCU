@@ -9,7 +9,37 @@ Experimental control can be done in various ways. E.g., Python 3 is installed, b
 Participants are seated with their heads in a chin- and head-rest. They then view the two screens through a set of mirrors so that their left eye sees the left screen and the right eye sees the right screen. This setup can then be used to run binocular rivalry or stereoscopy experiments.
 
 ## Eye-tracking    
-The set-up in lab space E003 has a [Tobii Pro Fusion eye tracker](https://www.tobii.com/products/eye-trackers/screen-based/tobii-pro-fusion?creative=641444153221&keyword=eyetracking%20software&matchtype=p&network=g&device=c&utm_source=google&utm_medium=cpc&utm_campaign=&utm_term=eyetracking%20software&gad_source=1) that can track the eyes through the hot-mirror of the stereoscope. This method is explained in [Brascamp & Naber, (2017)](https://psycnet.apa.org/record/2017-33915-010). The eyetracker can be calibrated with the `CalibrateEyetracker` function which sets the monitors in mirror mode to perform calibration and switches them back to extended mode when done. The equivalent code can also be run as part of the `BR_UCU` routine. Both methods call the `calibrateTobii.m` file to perform the calibration. 
+The set-up in lab space E003 has a [Tobii Pro Fusion eye tracker](https://www.tobii.com/products/eye-trackers/screen-based/tobii-pro-fusion?creative=641444153221&keyword=eyetracking%20software&matchtype=p&network=g&device=c&utm_source=google&utm_medium=cpc&utm_campaign=&utm_term=eyetracking%20software&gad_source=1) that can track the eyes through the hot-mirror of the stereoscope. This method is explained in [Brascamp & Naber, (2017)](https://psycnet.apa.org/record/2017-33915-010). The eyetracker can be calibrated with the `CalibrateEyetracker` function which sets the monitors in mirror mode to perform calibration and switches them back to extended mode when done. The equivalent code can also be run as part of the `BR_UCU` routine by setting the `eyetracker.calibrate` variable to `true`. Both methods call the `calibrateTobii.m` file to perform the calibration. 
+
+In the calibration screen you have the following key options:    
+`shift-escape`: hard exit from the calibration mode. By default, this causes en error to be thrown and script execution to stop if that error is not caught.    
+`shift-s`: skip calibration. If still at setup screen for the first time, the last calibration (perhaps of a previous session) remains active. To clear any calibration, first enter the calibration screen and immediately then skip with this key combination.
+
+Additional key options that you probably won't need but are nevertheless good to know about.    
+
+Only in the **Setup** display:       
+`spacebar`: start a calibration (setup.cal)       
+`e`: toggle eye images      
+`p`: return to validation result display, available if there are any previous calibrations     
+`c`: open menu to change which eye will be calibrated (both, left, right). The menu can be keyboard-controlled: each of the items in the menu are preceded by the number to press to activate that option.     
+
+In the **Calibration and validation** display:    
+`escape`: return to setup screen.      
+`r`: restart calibration sequence from the beginning     
+`backspace`: redo the current calibration/validation point.     
+`spacebar`: accept current calibration/validation point. (also done automatically)     
+
+In the **Validation result** display:     
+`spacebar`: select currently displayed calibration and exit the interface/continue experiment    
+`escape`: start a new calibration     
+`v`: revalidate the current calibration      
+`s`: return to the setup screen      
+`c`: bring up a menu from which other calibrations performed in the same session can be selected
+`g`: toggle whether online gaze position is visualized on the screen    
+`p`: bring up plot of gaze and pupil data collected during validation    
+`t`: toggle between whether gaze data collected during validation or during calibration is shown in the interface      
+`x`: toggle between whether gaze data and calibrations are shown in screen space or tracker space     
+
 
 ## Audio   
 The script can record audio and saves the tracks as a wav file per trial titled `voice_b-<BLOCKNUM>_t-<TRIALNUM>.wav`. The audiotrack is also saved as a matrix in the regular log file. If you choose to do this, it is highly recommended to also play a sound to mark the start of a trial. In order for all of this to work, you will need to tell the experiment script what the device IDs are for the recording and playing devices, and whether they are mono or stereo. If you leave this empty, default values will be used which are not guaranteed to work. There is a little script `ListAudioDevices` that will print the necessary information about the audiodevices that are present on the system to the command window. Get the proper device IDs adn the corresponding number of audio channels from this list and enter them in your settings file. 
