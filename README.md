@@ -34,8 +34,8 @@ In the **Validation result** display:
 `escape`: start a new calibration     
 `v`: revalidate the current calibration      
 `s`: return to the setup screen      
-`c`: bring up a menu from which other calibrations performed in the same session can be selected
-`g`: toggle whether online gaze position is visualized on the screen    
+`c`: bring up a menu from which other calibrations performed in the same session can be selected     
+`g`: toggle whether online gaze position is visualized on the screen       
 `p`: bring up plot of gaze and pupil data collected during validation    
 `t`: toggle between whether gaze data collected during validation or during calibration is shown in the interface      
 `x`: toggle between whether gaze data and calibrations are shown in screen space or tracker space     
