@@ -15,9 +15,6 @@ if nargin < 1
     eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % check this
 end
 
-% set monitors of stereoscopic setup in mirrored mode
-system("xrandr --output DP-2 --same-as DP-1") % set monitors mirrored 
-
 scr = max(Screen('Screens'));
 run(fullfile(eyetracker.toolboxfld,'addTittaToPath'));
 
@@ -52,11 +49,8 @@ try
     % shut down
     EThndl.deInit();   
     sca
-    % set monitors of stereoscopic setup in mirrored mode
-    system("xrandr --output DP-2 --right-of DP-1") % set monitors extended 
 catch me
     sca
     ListenChar(0);
     rethrow(me)
-    system("xrandr --output DP-2 --right-of DP-1") % set monitors extended 
 end

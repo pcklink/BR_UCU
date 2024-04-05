@@ -165,6 +165,7 @@ try
         EThndl.init(); % initiate eyetracker
         EThndl.buffer.start('gaze'); WaitSecs(.8); % start gazebuffer and wait a bit for it to start
         log.ev = [log.ev; {GetSecs,'EyeStart','GazeBuffer'}]; % log this start
+        fprintf('Eyetracker initialized\n');
     end
 
     % Sound init --
@@ -1266,10 +1267,8 @@ try
     % save the eye data and close off tracker
     if eyetracker.do
         EThndl.buffer.stop('gaze'); % close the buffer
-        dat = EThndl.collectSessionData();
-        dat.expt.resolution = monitor.wrect(3:4);
         fn = ['eyedata_' log.Label]; % create a label
-        EThndl.saveData(dat, fullfile(log.fld,log.Label,fn), true); % save
+        EThndl.saveData(fullfile(log.fld,log.Label,fn), true); % save
         EThndl.deInit(); % shut down
     end
 
@@ -1398,7 +1397,7 @@ end
             case 'extended'
                 system("xrandr --output DP-2 --right-of DP-1") % set monitors extended
         end
-        pause(3); % wait a few seconds for this to settle
+        WaitSecs(2); % wait a few seconds for this to settle
     end
 
     function [psOris] = CreatePrestimEndoOri(monitor, prestim, ps)

@@ -17,11 +17,14 @@ monitor.distance = 690; % mm distance to screen
 monitor.fliphorizontal = true; % mirror the video buffer to account for stereoscope mirrors
 monitor.stereomode = 4; % 4 = uncrossed screen halves / 5 = crossed screen halves [CHECK THIS!]
 monitor.maxpenwidth = 7; % Graphics card limitation, you can try ti increase, but may get errors
+monitor.DebugMode = 'UU';% Debug mode allows subscreen stim display
+% set this to 'NoDebug' when running the experiments
+% NoDebug / UU / CKHOME / CKNIN
 
 % eyetracker ---
-eyetracker.do = false; % using an eyetracker or not
+eyetracker.do = true; % using an eyetracker or not
 eyetracker.type = 'Tobii Pro Fusion'; % which eyetracker
-eyetracker.calibrate = true; % calibration as part of experiment (alternative is to do it separately
+eyetracker.calibrate = false; % calibration as part of experiment (alternative is to do it separately
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyetracker toolbox
 
 % sound ---
@@ -223,7 +226,7 @@ trialtype(1).eye(2).stim = 2; % stim for eye2
 block(1).reportmode = 'key'; % key/verbal/none
 block(1).trials = 1; % which trialtypes in the block
 block(1).randomizetrials = false; % randomize in block
-block(1).repeattrials = 1; % repeat trial sets this many times
+block(1).repeattrials = 3; % repeat trial sets this many times
 block(1).instruction = ['Some text to\n' ...
     'tell people what\n to do.\n\nPress key to start']; % replace with text you want
 
