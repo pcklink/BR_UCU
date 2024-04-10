@@ -17,8 +17,7 @@ log.settings_file = settings_file; % log the file name
 % variables need to be preallocated when they come from the settings file
 monitor = []; eyetracker = []; sound = []; keys = [];
 bg = []; fix = []; prestim = []; stim = [];
-trialtime = []; trialtype = [];
-block = []; expt = [];
+trialtype = []; block = []; expt = [];
 % get the info from the settings file
 run(settings_file)
 % get the location of this file for relative filepaths
@@ -289,50 +288,48 @@ try
 
     %% prestim --
     % prestim are the stimuli used for cueing in the exo/endogenous attention experiments
-    if trialtime.PrestimT % only if a prestim phase is set
-        for ps = 1:length(prestim)
-            switch prestim(ps).type
-                case 'grating'
-                    % Get screen height for square mesh
-                    s = round(monitor.PixHeight/2);
-                    % Create mesh for texture
-                    [x,y] = meshgrid(-s:s-1, -s:s-1);
-                    % Create the grating
-                    f = (prestim(ps).sf/monitor.Deg2Pix)*(2*pi); % cycles/pixel
-                    angle = 0; %basic, we can rotate when drawing
-                    a = cos(angle)*f; b = sin(angle)*f; phase=0;
-                    m = sin(a*x+b*y+phase);
-                    grattex0 = (0.5+0.5*m*prestim(ps).contrast);
-                    if strcmp(prestim(ps).attentiontype,'exogenous') % for exo, also create an increased contrast version
-                        grattex1 = (0.5+0.5*m*...
-                            (prestim(ps).contrast + prestim(ps).transient.contrastincr));
-                    end
-                    % Create the grating textures
-                    prestim(ps).GratText0 = ...
-                        Screen('MakeTexture', monitor.w, grattex0); %#ok<*AGROW>
-                    if strcmp(prestim(ps).attentiontype,'exogenous')
-                        prestim(ps).GratText1 = ...
-                            Screen('MakeTexture', monitor.w, grattex1);
-                    end
-                    % speed
-                    prestim(ps).driftpixsec = round(...
-                        prestim(ps).driftspeed.*monitor.Deg2Pix); % invert direction because we shift the cutting rect
-                    prestim(ps).driftpixframe = round(...
-                        prestim(ps).driftpixsec ./ monitor.refreshRate);
-                    prestim(ps).driftreset = monitor.refreshRate./...
-                        (prestim(ps).sf*prestim(ps).driftspeed); % nframes to full period drift
-                case 'dots'
-                    % do most of this on the fly later
-                    prestim(ps).dotsizepix = round(prestim(ps).dotsize * monitor.Deg2Pix);
-                    % speed
-                    prestim(ps).driftpixsec = round(...
-                        prestim(ps).driftspeed.*monitor.Deg2Pix);
-                    prestim(ps).driftpixframe = round(...
-                        prestim(ps).driftpixsec ./ monitor.refreshRate);
-            end
+    for ps = 1:length(prestim)
+        switch prestim(ps).type
+            case 'grating'
+                % Get screen height for square mesh
+                s = round(monitor.PixHeight/2);
+                % Create mesh for texture
+                [x,y] = meshgrid(-s:s-1, -s:s-1);
+                % Create the grating
+                f = (prestim(ps).sf/monitor.Deg2Pix)*(2*pi); % cycles/pixel
+                angle = 0; %basic, we can rotate when drawing
+                a = cos(angle)*f; b = sin(angle)*f; phase=0;
+                m = sin(a*x+b*y+phase);
+                grattex0 = (0.5+0.5*m*prestim(ps).contrast);
+                if strcmp(prestim(ps).attentiontype,'exogenous') % for exo, also create an increased contrast version
+                    grattex1 = (0.5+0.5*m*...
+                        (prestim(ps).contrast + prestim(ps).transient.contrastincr));
+                end
+                % Create the grating textures
+                prestim(ps).GratText0 = ...
+                    Screen('MakeTexture', monitor.w, grattex0); %#ok<*AGROW>
+                if strcmp(prestim(ps).attentiontype,'exogenous')
+                    prestim(ps).GratText1 = ...
+                        Screen('MakeTexture', monitor.w, grattex1);
+                end
+                % speed
+                prestim(ps).driftpixsec = round(...
+                    prestim(ps).driftspeed.*monitor.Deg2Pix); % invert direction because we shift the cutting rect
+                prestim(ps).driftpixframe = round(...
+                    prestim(ps).driftpixsec ./ monitor.refreshRate);
+                prestim(ps).driftreset = monitor.refreshRate./...
+                    (prestim(ps).sf*prestim(ps).driftspeed); % nframes to full period drift
+            case 'dots'
+                % do most of this on the fly later
+                prestim(ps).dotsizepix = round(prestim(ps).dotsize * monitor.Deg2Pix);
+                % speed
+                prestim(ps).driftpixsec = round(...
+                    prestim(ps).driftspeed.*monitor.Deg2Pix);
+                prestim(ps).driftpixframe = round(...
+                    prestim(ps).driftpixsec ./ monitor.refreshRate);
         end
-        %fprintf('Prestim created\n');
     end
+    %fprintf('Prestim created\n');
 
     %% stim --
     % the main binocular rivalry stimuli
@@ -496,7 +493,7 @@ try
                 EThndl.sendMessage('FixStart',vbl) % log on eyetracker
             end
 
-            while (GetSecs-FixT0) < trialtime.FixT && ~StopExp
+            while (GetSecs-FixT0) < trialtype(T).time.FixT && ~StopExp
                 % check keys for escape
                 [secs, ~, keyCode] = KbCheck;
                 if strcmp(KbName(find(keyCode)),keys.esc)
@@ -513,14 +510,14 @@ try
 
             %% PRESTIM ----
             % the prestim phase
-            if trialtime.PrestimT % only if a prestim phase is set
+            if trialtype(T).time.PrestimT % only if a prestim phase is set
                 % get a series of orientation for prestim frames
                 switch prestim(ps).attentiontype
                     case 'endogenous'
                         psOris = CreatePrestimEndoOri(monitor, prestim, ps); % create a series of oerientation values
                     case 'exogenous'
                         % define which videoframes wil show the high contrast stimulus
-                        total_fr = round(trialtime.PrestimT*monitor.refreshRate);
+                        total_fr = round(trialtype(T).time.PrestimT*monitor.refreshRate);
                         trans_frw = round(...
                             prestim(ps).transient.timewindow*monitor.refreshRate + total_fr);
                         trans_frw = Shuffle(trans_frw(1):trans_frw(2));
@@ -550,8 +547,8 @@ try
                 PreStimStarted = false;
                 PreStimT0 = 0; vbl = 0; cF = 0;
 
-                f=1; % framenuber
-                while (vbl - PreStimT0) < trialtime.PrestimT && ~StopExp
+                f=1; % framenumber
+                while (vbl - PreStimT0) < trialtype(T).time.PrestimT && ~StopExp
                     % run this for the predetermined duration
                     % show the stimulus
                     for fb = [0 1]
@@ -885,7 +882,7 @@ try
                 PsychPortAudio('Start', hplay, 1, 0, 1);
             end
 
-            while (GetSecs - GapT0) < trialtime.PrestimGapT && ~StopExp
+            while (GetSecs - GapT0) < trialtype(T).time.PrestimGapT && ~StopExp
                 % check keys for escape
                 [~, ~, keyCode] = KbCheck;
                 if strcmp(KbName(find(keyCode)),keys.esc)
@@ -905,7 +902,7 @@ try
             keys.LastKey = [];
             %fprintf('Starting stim\n')
 
-            while vbl-StimStarted < trialtime.StimT  && ~StopExp
+            while vbl-StimStarted < trialtype(T).time.StimT  && ~StopExp
                 % stim
                 for fb = [0 1]
                     DrawBackground(monitor, fb, bg);
@@ -1241,7 +1238,7 @@ try
                 EThndl.sendMessage('ITIStart',vbl)
             end
 
-            while (GetSecs - ITIT0) < trialtime.ITIT && ~StopExp
+            while (GetSecs - ITIT0) < trialtype(T).time.ITIT && ~StopExp
                 % check keys for escape
                 [~, ~, keyCode] = KbCheck;
                 if strcmp(KbName(find(keyCode)),keys.esc)
@@ -1259,7 +1256,7 @@ try
     settings.monitor = monitor; settings.eyetracker = eyetracker;
     settings.sound = sound; settings.keys = keys;
     settings.bg = bg; settings.fix = fix; settings.prestim = prestim; settings.stim = stim;
-    settings.trialtime = trialtime; settings.trialtype = trialtype;
+    settings.trialtype = trialtype;
     settings.block = block; settings.expt = expt;
     % save the log
     save(fullfile(RunPath, log.fld, log.Label, 'logfile'),'settings','log');
