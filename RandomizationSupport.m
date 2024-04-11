@@ -18,7 +18,7 @@
 blockchunk{1} = [1 2]; % block numbers for button presses
 blockchunk{2} = [3 4]; % block numbers for no report
 
-blockrepeats = 4; % repeat 'sets' of blocks
+blockrepeats = 1; % repeat 'sets' of blocks
 
 blockorder = [];
 
@@ -35,9 +35,9 @@ for i = 1:blockrepeats
     for j = j
         %randomize within chunk
         if randomblocksinchunk
-            k = randperm(length(blockchunk{j}));
+            k = blockchunk{j}(randperm(length(blockchunk{j})));
         else
-            k = 1:length(blockchunk{j});
+            k = blockchunk{j};
         end
         blockorder = [blockorder k];
     end
