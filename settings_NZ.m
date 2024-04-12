@@ -17,9 +17,12 @@ monitor.distance = 690; % mm distance to screen
 monitor.fliphorizontal = true; % mirror the video buffer to account for stereoscope mirrors
 monitor.stereomode = 4; % 4 = uncrossed screen halves / 5 = crossed screen halves [CHECK THIS!]
 monitor.maxpenwidth = 7; % Graphics card limitation, you can try to increase, but may get errors
+monitor.DebugMode = 'NoDebug';% Debug mode allows subscreen stim display
+% set this to 'NoDebug' when running the experiments
+% NoDebug / UU / CKHOME / CKNIN
 
 % eyetracker ---
-eyetracker.do = false; % using an eyetracker or not
+eyetracker.do = true; % using an eyetracker or not
 eyetracker.type = 'Tobii Pro Fusion'; % which eyetracker
 eyetracker.calibrate = false; % calibration as part of experiment (alternative is to do it separately
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyetracker toolbox
@@ -28,7 +31,10 @@ eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyet
 sound.recordmic = false; % necessary for verbal reports
 sound.startbeep = false; % you might want to use this as a start marker on the recorded track
 sound.mic.maxsec = []; % infinite if empty
-sound.mic.device = []; % auto if empty, only necessary if multiple are present
+sound.mic.device = 6; % auto if empty, only necessary if multiple are present
+sound.mic.nchan = 1; % mono or stereo mic
+sound.play.device = 0; % auto if empty, only necessary if multiple are present
+sound.play.nchan = 2; % mono or stereo 
 sound.beepfile = 'beep.wav'; % should be in root folder; plays as marker
 
 % keys ---

@@ -22,7 +22,7 @@ monitor.DebugMode = 'NoDebug';% Debug mode allows subscreen stim display
 % NoDebug / UU / CKHOME / CKNIN
 
 % eyetracker ---
-eyetracker.do = false; % using an eyetracker or not
+eyetracker.do = true; % using an eyetracker or not
 eyetracker.type = 'Tobii Pro Fusion'; % which eyetracker
 eyetracker.calibrate = true; % calibration as part of experiment (alternative is to do it separately
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyetracker toolbox
