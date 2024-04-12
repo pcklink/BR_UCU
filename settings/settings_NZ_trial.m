@@ -12,17 +12,17 @@
 %% Hardware ----
 % -------------------------------
 % monitor ---
-monitor.gamma = 2.2; % used for linearizaion of contrast, measured by CP [DO NOT CHANGE]
+monitor.gamma = 1; 2.2; % used for linearizaion of contrast, measured by CP [DO NOT CHANGE]
 monitor.distance = 690; % mm distance to screen
 monitor.fliphorizontal = true; % mirror the video buffer to account for stereoscope mirrors
 monitor.stereomode = 4; % 4 = uncrossed screen halves / 5 = crossed screen halves [CHECK THIS!]
 monitor.maxpenwidth = 7; % Graphics card limitation, you can try to increase, but may get errors
-monitor.DebugMode = 'NoDebug';% Debug mode allows subscreen stim display
+monitor.DebugMode = 'CKHOME';% Debug mode allows subscreen stim display
 % set this to 'NoDebug' when running the experiments
 % NoDebug / UU / CKHOME / CKNIN
 
 % eyetracker ---
-eyetracker.do = true; % using an eyetracker or not
+eyetracker.do = false; % using an eyetracker or not
 eyetracker.type = 'Tobii Pro Fusion'; % which eyetracker
 eyetracker.calibrate = false; % calibration as part of experiment (alternative is to do it separately
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyetracker toolbox
@@ -88,6 +88,7 @@ prestim(1).transient.contrastincr = 0.6; % change in contrast for exogenous atte
 prestim(1).transient.stim = 1; % which stim gets the transient
 prestim(1).transient.duration = 150; % how long is the contrast change
 prestim(1).transient.timewindow = [-2 -1]; % when can it happen relative to end of prestim [max min]
+prestim(1).transient.postpause = 0.5; % don't wait for key
 prestim(1).instruct = ['Fix your gaze on the red dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
 % prestim(1).quest = 'Left or Right'; % question text after the prestim (key-press left/right is logged)
 

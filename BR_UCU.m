@@ -526,6 +526,7 @@ try
                             round(prestim(ps).transient.duration*monitor.refreshRate)];
                 end
 
+
                 % instruction screen --
                 % tell your participants what to do
                 for fb = [0 1] % both framebuffers for stereomode
@@ -548,8 +549,23 @@ try
                 PreStimStarted = false;
                 PreStimT0 = 0; vbl = 0; cF = 0;
 
+                % safety check
+                if strcmp(prestim(ps).attentiontype,'endogenous') && ...
+                        sum(prestim(ps).durations) < trialtype(T).time.PrestimT
+                    PreStimT = sum(prestim(ps).durations);
+                    fprintf(['ALERT: Your requested prestim time of ' ...
+                        num2str(trialtype(T).time.PrestimT) 's is longer than ' ...
+                        'your prestim definition of ' num2str(PreStimT) 's.\n']);
+                    fprintf(['The prestim time was adjusted down to ' ...
+                         num2str(PreStimT) 's. Check your settings file.\n']);
+                else
+                    PreStimT = trialtype(T).time.PrestimT;
+                end
+
                 f=1; % framenumber
-                while (vbl - PreStimT0) < trialtype(T).time.PrestimT && ~StopExp
+                while (vbl - PreStimT0) < PreStimT && ~StopExp
+                    %[vbl - PreStimT0 f]
+
                     % run this for the predetermined duration
                     % show the stimulus
                     for fb = [0 1]
@@ -617,10 +633,15 @@ try
                                                     prestim(ps).dotlifetime);
                                                 
                                             else
+                                                % in case we want just one frame too many due to
+                                                if f > size(psOris,2)
+                                                    f = size(psOris,2);
+                                                end
+
                                                 % - move
                                                 prestim(ps).driftpixframeXY = [...
-                                                    sind(psOris(a,cF+1)).* prestim(ps).driftpixframe(a) ...
-                                                    cosd(psOris(a,cF+1)).* prestim(ps).driftpixframe(a)];
+                                                    sind(psOris(a,f)).* prestim(ps).driftpixframe(a) ...
+                                                    cosd(psOris(a,f)).* prestim(ps).driftpixframe(a)];
                                                 
                                                 for d=1:2
                                                     prestim(ps).dot.xy{a}(d,:) = ...
@@ -837,20 +858,25 @@ try
                 vbl = Screen('Flip', monitor.w);
 
                 % wait for key response
-                RespLogged = false;
-                while  ~RespLogged
-                    [KeyIsDown,keys.secs,keys.keyCode] = KbCheck;
-                    if KeyIsDown
-                        keys.LastKey = KbName(find(keys.keyCode)); % Get the name of the pressed key
-                        if strcmp(keys.LastKey,keys.resp{1}) || strcmp(keys.LastKey,keys.resp{2})
-                            log.ev = [log.ev; {keys.secs,'PreStimResponse',keys.LastKey}];
-                            RespLogged = true;
-                        elseif strcmp(keys.LastKey,keys.esc)
-                            RespLogged = true;
-                            StopExp = true;
-                            break;
+                if strcmp(prestim(ps).attentiontype,'endogenous')
+                    RespLogged = false;
+                    while  ~RespLogged
+                        [KeyIsDown,keys.secs,keys.keyCode] = KbCheck;
+                        if KeyIsDown
+                            keys.LastKey = KbName(find(keys.keyCode)); % Get the name of the pressed key
+                            if strcmp(keys.LastKey,keys.resp{1}) || strcmp(keys.LastKey,keys.resp{2})
+                                log.ev = [log.ev; {keys.secs,'PreStimResponse',keys.LastKey}];
+                                RespLogged = true;
+                            elseif strcmp(keys.LastKey,keys.esc)
+                                RespLogged = true;
+                                StopExp = true;
+                                break;
+                            end
                         end
                     end
+                else
+                    % wait for a bit
+                    WaitSecs(prestim(ps).transient.postpause);
                 end
             end
 
@@ -1403,20 +1429,20 @@ end
             TargetOri = prestim(ps).orientations(g,:);
             dA = prestim(ps).change.degpersec;
             pC = prestim(ps).change.prob;
-            cInt = prestim(ps).change.interval*monitor.refreshRate;
-            nSteps = round(prestim(ps).durations(2)*monitor.refreshRate);
+            cInt = round(prestim(ps).change.interval*monitor.refreshRate);
+            nSteps = ceil(prestim(ps).durations(2)*monitor.refreshRate);
 
             startstatic = TargetOri(1).*ones(1, ...
-                round(prestim(ps).durations(1)*monitor.refreshRate));
+                floor(prestim(ps).durations(1)*monitor.refreshRate));
             stopstatic = TargetOri(1).*ones(1, ...
-                round(prestim(ps).durations(1)*monitor.refreshRate));
+                ceil(prestim(ps).durations(1)*monitor.refreshRate));
 
             noChange = false;
             Ori = startstatic;
             LastChange = 0;
             TC = TargetOri(1);
 
-            for ns = 1:nSteps
+            for ns = 1:nSteps+1
                 TC = TC + dA;
 
                 if TC > 360; TC = TC-360; end
