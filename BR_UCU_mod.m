@@ -1,4 +1,4 @@
-function BR_UCU(settings_file)
+function BR_UCU_mod(settings_file)
 
 % Running a range of binocular rivalry experiments for UCU projects.
 % Use a settings file to configure.
@@ -18,12 +18,11 @@ log.settings_file = settings_file; % log the file name
 monitor = []; eyetracker = []; sound = []; keys = [];
 bg = []; fix = []; prestim = []; stim = [];
 trialtype = []; block = []; expt = [];
-
+% get the info from the settings file
+run(settings_file)
 % get the location of this file for relative filepaths
 [RunPath,~,~] = fileparts(mfilename('fullpath'));
 
-% get the info from the settings file
-run(fullfile(RunPath,'settings',settings_file));
 
 % Debug mode allows subscreen stim display
 DebugMode = monitor.DebugMode;
@@ -71,7 +70,7 @@ try
 
     % Do some basic initializing
     PsychDefaultSetup(2); HideCursor;
-    ListenChar(2); % silence keyboard for matlab
+   % ListenChar(2); % silence keyboard for matlab
 
     % Get screen info --
     scr = Screen('screens'); % get screen info
@@ -735,15 +734,16 @@ try
                                                         prestim(ps).dotcoltrans(a,:) = 0.5 + ...
                                                             (rand(1,prestim(ps).nDots).*coltrans) - ...
                                                             coltrans/2;
+
+                                                        prestim(ps).dotcols{a} = [...
+                                                            prestim(ps).dotcol(a,:);...
+                                                            prestim(ps).dotcol(a,:);...
+                                                            prestim(ps).dotcol(a,:)];
+                                                        prestim(ps).dotcolstrans{a} = [...
+                                                            prestim(ps).dotcoltrans(a,:);...
+                                                            prestim(ps).dotcoltrans(a,:);...
+                                                            prestim(ps).dotcoltrans(a,:)];
                                                     end
-                                                    prestim(ps).dotcols{a} = [...
-                                                        prestim(ps).dotcol(a,:);...
-                                                        prestim(ps).dotcol(a,:);...
-                                                        prestim(ps).dotcol(a,:)];
-                                                    prestim(ps).dotcolstrans{a} = [...
-                                                        prestim(ps).dotcoltrans(a,:);...
-                                                        prestim(ps).dotcoltrans(a,:);...
-                                                        prestim(ps).dotcoltrans(a,:)];
                                                 end
                                                 % dot age
                                                 prestim(ps).dotage(a,:) = round(rand(1,prestim(ps).nDots).*...

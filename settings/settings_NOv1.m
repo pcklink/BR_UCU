@@ -16,7 +16,7 @@ monitor.gamma = 2.2; % used for linearizaion of contrast, measured by CP [DO NOT
 monitor.distance = 690; % mm distance to screen
 monitor.fliphorizontal = true; % mirror the video buffer to account for stereoscope mirrors
 monitor.stereomode = 4; % 4 = uncrossed screen halves / 5 = crossed screen halves [CHECK THIS!]
-monitor.maxpenwidth = 7; % Graphics card limitation, you can try to increase, but may get errors
+monitor.maxpenwidth = 7; % Graphics card limitation, you can try ti increase, but may get errors
 monitor.DebugMode = 'NoDebug';% Debug mode allows subscreen stim display
 % set this to 'NoDebug' when running the experiments
 % NoDebug / UU / CKHOME / CKNIN
@@ -28,10 +28,10 @@ eyetracker.calibrate = false; % calibration as part of experiment (alternative i
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyetracker toolbox
 
 % sound ---
-sound.recordmic = false; % necessary for verbal reports
-sound.startbeep = false; % you might want to use this as a start marker on the recorded track
+sound.recordmic = true; % necessary for verbal reports
+sound.startbeep = true; % you might want to use this as a start marker on the recorded track
 sound.mic.maxsec = []; % infinite if empty
-sound.mic.device = 6; % auto if empty, only necessary if multiple are present
+sound.mic.device = 5; % auto if empty, only necessary if multiple are present
 sound.mic.nchan = 1; % mono or stereo mic
 sound.play.device = 0; % auto if empty, only necessary if multiple are present
 sound.play.nchan = 2; % mono or stereo 
@@ -163,46 +163,6 @@ stim(2).contrast = 1; % contrast 0-1
 stim(2).orient = -45; % degrees clockwise
 stim(2).driftspeed = 1.5; % deg/s 
 
-stim(3).type = 'dots'; % stimulus type
-stim(3).dotsize = 0.25; % deg
-stim(3).dotdensity = 3; % dots/deg2
-stim(3).dotlifetime = 10; % dot life in # frames ([] is unlimited)
-stim(3).contrast = 1;  % contrast 0-1
-stim(3).contrastbin = true; % if true, only use highest and lowest
-stim(3).color = []; % leave empty for luminance contrast
-stim(3).driftspeed = [1.5 0]; % [h v] deg/s positive is rightward/down
-
-stim(4).type = 'dots'; % stimulus type
-stim(4).dotsize = 0.25; % deg
-stim(4).dotdensity = 3; % dots/deg2
-stim(4).dotlifetime = 10; % dot life in # frames ([] is unlimited)
-stim(4).contrast = 1;  % contrast 0-1
-stim(4).contrastbin = true; % if true, only use highest and lowest
-stim(4).color = []; % leave empty for luminance contrast
-stim(4).driftspeed = [-1.5 0]; % [h v] deg/s positive is rightward/down
-
-stim(5).type = 'image'; % load a bitmap
-stim(5).image = 'image-01.bmp'; % should be in the images folder
-stim(5).overlay.type = 'dots'; % overlay type of stimulus
-stim(5).overlay.dotsize = 0.25; % deg
-stim(5).overlay.dotdensity = 3; % dots/deg2
-stim(5).overlay.dotlifetime = 10; % dot life in # frames ([] is unlimited)
-stim(5).overlay.contrast = 1;  % contrast 0-1
-stim(5).overlay.contrastbin = true; % if true all dots have either the min or max value of the contrast
-stim(5).overlay.color = []; % [R G B] if empty, contrast is used
-stim(5).overlay.opacity = 0.5; % transparancy 0-1
-stim(5).overlay.driftspeed = [1.5 0]; % [h v] deg/s positive is rightward/down
-
-stim(6).type = 'image'; % load a bitmap
-stim(6).image = 'image-02.bmp'; % should be in the images folder
-stim(6).overlay.type = 'lines';  % overlay type of stimulus
-stim(6).overlay.linewidth = 0.1; % deg
-stim(6).overlay.linedensity = 2; % lines/deg
-stim(6).overlay.color = [0 0 0]; % [R G B] if empty, contrast is used
-stim(6).overlay.opacity = 0.5; % transparancy 0-1
-stim(6).overlay.orientation = 'vertical'; % horizontal/vertical
-stim(6).overlay.driftspeed = 1.5; % deg/s positive is rightward/down
-
 % -------------------------------
 %% Experiment structure ----
 % -------------------------------
@@ -210,151 +170,45 @@ stim(6).overlay.driftspeed = 1.5; % deg/s positive is rightward/down
 % timing --
 % Choose timing consisten with 60Hz refresh rate
 % so multiples of 1/60 s
-trialtime.FixT = 1; %s time without stimulus / with alignment
-trialtime.PrestimT = 2; %s leave empty or set zero for none
-trialtime.PrestimGapT = 0.25; %s between prestim and stim
-trialtime.StimT = 1; %s stimulus duration
+trialtime.FixT = 1; %s time without stimus / with alignment
+trialtime.PrestimT = []; %s leave empty or set zero for none
+trialtime.PrestimGapT = 1; %s between prestim and stim
+trialtime.StimT = 5; %s stimulus duration
 trialtime.ITIT  = 1; %s intertrial interval
 
 % trials --
-% exogenous dots trial
-trialtype(1).stimsize = [4 4]; % which stimuli [left right]
-trialtype(1).prestim = 2; % which prestim
-trialtype(1).eye(1).stim = 3; % stim for eye1
-trialtype(1).eye(2).stim = 4; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(1).time.FixT = 1; %s time without stimus / with alignment
-trialtype(1).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(1).time.PrestimGapT = 1; %s between prestim and stim
-trialtype(1).time.StimT = 5; %s stimulus duration
-trialtype(1).time.ITIT  = 1; %s intertrial interval
-
-% exogenous dots trial - eyes changed
-trialtype(2).stimsize = [4 4]; % which stimuli [left right]
-trialtype(2).prestim = 2; % which prestim
-trialtype(2).eye(1).stim = 4; % stim for eye1
-trialtype(2).eye(2).stim = 3; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(2).time.FixT = 1; %s time without stimus / with alignment
-trialtype(2).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(2).time.PrestimGapT = 1; %s between prestim and stim
-trialtype(2).time.StimT = 5; %s stimulus duration
-trialtype(2).time.ITIT  = 1; %s intertrial interval
-
-% exogenous dots catch trial
-trialtype(3).stimsize = [4 4]; % which stimuli [left right]
-trialtype(3).prestim = 2; % which prestim
-trialtype(3).eye(1).stim = 3; % stim for eye1
-trialtype(3).eye(2).stim = 3; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(3).time.FixT = 1; %s time without stimus / with alignment
-trialtype(3).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(3).time.PrestimGapT = 1; %s between prestim and stim
-trialtype(3).time.StimT = 5; %s stimulus duration
-trialtype(3).time.ITIT  = 1; %s intertrial interval
-
-% exogenous dots catch trial - other direction
-trialtype(4).stimsize = [4 4]; % which stimuli [left right]
-trialtype(4).prestim = 2; % which prestim
-trialtype(4).eye(1).stim = 4; % stim for eye1
-trialtype(4).eye(2).stim = 4; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(4).time.FixT = 1; %s time without stimus / with alignment
-trialtype(4).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(4).time.PrestimGapT = 1; %s between prestim and stim
-trialtype(4).time.StimT = 5; %s stimulus duration
-trialtype(4).time.ITIT  = 1; %s intertrial interval
-
-% endogenous dots trial
-trialtype(5).stimsize = [4 4]; % which stimuli [left right]
-trialtype(5).prestim = 4; % which prestim
-trialtype(5).eye(1).stim = 3; % stim for eye1
-trialtype(5).eye(2).stim = 4; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(5).time.FixT = 1; %s time without stimus / with alignment
-trialtype(5).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(5).time.PrestimGapT = 1; %s between prestim and stim
-trialtype(5).time.StimT = 5; %s stimulus duration
-trialtype(5).time.ITIT  = 1; %s intertrial interval
-
-% endogenous dots trial - eyes changed
-trialtype(6).stimsize = [4 4]; % which stimuli [left right]
-trialtype(6).prestim = 4; % which prestim
-trialtype(6).eye(1).stim = 4; % stim for eye1
-trialtype(6).eye(2).stim = 3; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(6).time.FixT = 1; %s time without stimus / with alignment
-trialtype(6).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(6).time.PrestimGapT = 1; %s between prestim and stim
-trialtype(6).time.StimT = 5; %s stimulus duration
-trialtype(6).time.ITIT  = 1; %s intertrial interval
-
-% endogenous dots catch trial
-trialtype(7).stimsize = [4 4]; % which stimuli [left right]
-trialtype(7).prestim = 4; % which prestim
-trialtype(7).eye(1).stim = 3; % stim for eye1
-trialtype(7).eye(2).stim = 3; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(7).time.FixT = 1; %s time without stimus / with alignment
-trialtype(7).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(7).time.PrestimGapT = 1; %s between prestim and stim
-trialtype(7).time.StimT = 5; %s stimulus duration
-trialtype(7).time.ITIT  = 1; %s intertrial interval
-
-% endogenous dots catch trial - other direction
-trialtype(8).stimsize = [4 4]; % which stimuli [left right]
-trialtype(8).prestim = 4; % which prestim
-trialtype(8).eye(1).stim = 4; % stim for eye1
-trialtype(8).eye(2).stim = 4; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(8).time.FixT = 1; %s time without stimus / with alignment
-trialtype(8).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(8).time.PrestimGapT = 1; %s between prestim and stim
-trialtype(8).time.StimT = 5; %s stimulus duration
-trialtype(8).time.ITIT  = 1; %s intertrial interval
+trialtype(1).stimsize = [4 4]; % wchich stimuli [left right]
+trialtype(1).prestim = 2; % whic prestim
+trialtype(1).eye(1).stim = 1; % stim for eye1
+trialtype(1).eye(2).stim = 2; % stim for eye2
 
 % blocks --
-% button-press report
 block(1).reportmode = 'key'; % key/verbal/none
-block(1).trials = [1 2 5 6]; % which trialtypes in the block
-block(1).randomizetrials = true; % randomize in block
-block(1).repeattrials = 2; % repeat trial sets this many times
-block(1).instruction = ['Press buttons \n' ...
-    'left or right \n :).\n\nPress key to start']; % replace with text you want
-% button-press report catch trial block
-block(2).reportmode = 'key'; % key/verbal/none
-block(2).trials = [3 4 7 8]; % which trialtypes in the block
-block(2).randomizetrials = true; % randomize in block
-block(2).repeattrials = 1; % repeat trial sets this many times
-block(2).instruction = ['press buttons to\n' ...
-    'left or right what\n :).\n\nPress key to start']; % replace with text you want
-
-% no report
-block(3).reportmode = 'none'; % key/verbal/none
-block(3).trials = [1 2 5 6]; % which trialtypes in the block
-block(3).randomizetrials = true; % randomize in block
-block(3).repeattrials = 2; % repeat trial sets this many times
-block(3).instruction = ['Some text to\n' ...
+block(1).trials = 1; % which trialtypes in the block
+block(1).randomizetrials = false; % randomize in block
+block(1).repeattrials = 1; % repeat trial sets this many times
+block(1).instruction = ['Press key\n' ...
     'tell people what\n to do.\n\nPress key to start']; % replace with text you want
-% no report catch trial block
-block(4).reportmode = 'none'; % key/verbal/none
-block(4).trials = [3 4 7 8]; % which trialtypes in the block
-block(4).randomizetrials = true; % randomize in block
-block(4).repeattrials = 1; % repeat trial sets this many times
-block(4).instruction = ['Some text to\n' ...
+
+% blocks --
+block(2).reportmode = 'verbal'; % key/verbal/none
+block(2).trials = 1; % which trialtypes in the block
+block(2).randomizetrials = false; % randomize in block
+block(2).repeattrials = 1; % repeat trial sets this many times
+block(2).instruction = ['Some text to\n' ...
+    'tell people what\n to do.\n\nPress key to start']; % replace with text you want
+
+% blocks --
+block(3).reportmode = 'none'; % key/verbal/none
+block(3).trials = 1; % which trialtypes in the block
+block(3).randomizetrials = false; % randomize in block
+block(3).repeattrials = 1; % repeat trial sets this many times
+block(3).instruction = ['Some text to\n' ...
     'tell people what\n to do.\n\nPress key to start']; % replace with text you want
 
 % expt --
-expt.blockorder = [1 2 3 4]; % set for a specific order, empty means 1:end
-expt.randomizeblocks = true; % overrules order
+expt.blockorder = [1]; % set for a specific order, empty means 1:end
+expt.randomizeblocks = false; % overrules order
 expt.blockrepeats = 1; % randomization only within set of repeats
 expt.thanktext = 'That was it\nThank you!';
 expt.thankdur = 2; % seconds
