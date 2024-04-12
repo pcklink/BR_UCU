@@ -515,7 +515,7 @@ try
                 % get a series of orientation for prestim frames
                 switch prestim(ps).attentiontype
                     case 'endogenous'
-                        psOris = CreatePrestimEndoOri(monitor, prestim, ps); % create a series of oerientation values
+                        psOris = CreatePrestimEndoOri(monitor, prestim, ps); % create a series of orientation values
                     case 'exogenous'
                         % define which videoframes wil show the high contrast stimulus
                         total_fr = round(trialtype(T).time.PrestimT*monitor.refreshRate);
@@ -1453,7 +1453,7 @@ end
                             LastChange = ns;
                         end
                     elseif dA > 0
-                        if abs((nSteps-s)*dA) <= 360-dT
+                        if abs((nSteps-ns)*dA) <= 360-dT
                             noChange = true;
                         end
                     end

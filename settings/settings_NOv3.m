@@ -76,14 +76,14 @@ fix.color = [1 0 0]; % [R G B]
 stim(1).type = 'grating'; % stimulus type
 stim(1).sf = 2; % spatial frequency in cycles/deg
 stim(1).contrast = 1; % contrast 0-1
-stim(1).orient = 45; % degrees clockwise
-stim(1).driftspeed = 1.2; % deg/s 
+stim(1).orient = 60; % degrees clockwise
+stim(1).driftspeed = 1.5; % deg/s 
 
 stim(2).type = 'grating'; % stimulus type
 stim(2).sf = 2; % spatial frequency in cycles/deg
 stim(2).contrast = 1; % contrast 0-1
-stim(2).orient = -45; % degrees clockwise
-stim(2).driftspeed = -1.2; % deg/s 
+stim(2).orient = -60; % degrees clockwise
+stim(2).driftspeed = -1.5; % deg/s 
 
 % -------------------------------
 %% Experiment structure 
@@ -124,7 +124,7 @@ trialtype(3).eye(2).stim = 2; % stim for eye2
 trialtype(3).time.FixT = 0; %s time without stimus / with alignment
 trialtype(3).time.PrestimT = []; %s leave empty or set zero for none
 trialtype(3).time.PrestimGapT = 0; %s between prestim and stim
-trialtype(3).time.StimT = 120; %s stimulus duration
+trialtype(3).time.StimT = 60; %s stimulus duration
 trialtype(3).time.ITIT  = 0; %s intertrial interval
 
 %% 
@@ -183,7 +183,7 @@ block(6).repeattrials = 1; % repeat trial sets this many times
 %%
 
 % expt --
-expt.blockorder = [1 2]; % set for a specific order, empty means 1:end
+expt.blockorder = [1 2 3 4]; % set for a specific order, empty means 1:end
 % expt.blockorder = [1 2 2 1 1 2 2 1 3 4 4 3 3 4 4 3 5 6 6 5 5 6 6 5]; % set for a specific order, empty means 1:end
 expt.randomizeblocks = false; % overrules order
 expt.blockrepeats = 1; % randomization only within set of repeats
