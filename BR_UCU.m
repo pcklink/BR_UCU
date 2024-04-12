@@ -1453,7 +1453,7 @@ end
                             LastChange = ns;
                         end
                     elseif dA > 0
-                        if abs((nSteps-s)*dA) <= 360-dT
+                        if abs((nSteps-ns)*dA) <= 360-dT
                             noChange = true;
                         end
                     end
