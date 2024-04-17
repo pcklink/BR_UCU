@@ -174,6 +174,8 @@ trialtype(1).time.PrestimT = 5; %s leave empty or set zero for none
 trialtype(1).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(1).time.StimT = 5; %s stimulus duration
 trialtype(1).time.ITIT  = 1; %s intertrial interval
+trialtype(1).replay = false; % replay trial?
+trialtype(1).replayminmax = [3 6]; % min/max epoch duration
 
 % exogenous dots trial - eyes changed
 trialtype(2).stimsize = [4 4]; % which stimuli [left right]
@@ -187,6 +189,8 @@ trialtype(2).time.PrestimT = 1; %s leave empty or set zero for none
 trialtype(2).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(2).time.StimT = 1; %s stimulus duration
 trialtype(2).time.ITIT  = 1; %s intertrial interval
+trialtype(2).replay = false; % replay trial?
+trialtype(2).replayminmax = [3 6]; % min/max epoch duration
 
 % exogenous dots catch trial
 trialtype(3).stimsize = [4 4]; % which stimuli [left right]
@@ -200,6 +204,8 @@ trialtype(3).time.PrestimT = 5; %s leave empty or set zero for none
 trialtype(3).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(3).time.StimT = 5; %s stimulus duration
 trialtype(3).time.ITIT  = 1; %s intertrial interval
+trialtype(3).replay = false; % replay trial?
+trialtype(3).replayminmax = [3 6]; % min/max epoch duration
 
 % exogenous dots catch trial - other direction
 trialtype(4).stimsize = [4 4]; % which stimuli [left right]
@@ -213,6 +219,8 @@ trialtype(4).time.PrestimT = 1; %s leave empty or set zero for none
 trialtype(4).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(4).time.StimT = 1; %s stimulus duration
 trialtype(4).time.ITIT  = 1; %s intertrial interval
+trialtype(4).replay = false; % replay trial?
+trialtype(4).replayminmax = [3 6]; % min/max epoch duration
 
 % endogenous dots trial
 trialtype(5).stimsize = [4 4]; % which stimuli [left right]
@@ -226,6 +234,8 @@ trialtype(5).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(5).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(5).time.StimT = 5; %s stimulus duration
 trialtype(5).time.ITIT  = 1; %s intertrial interval
+trialtype(5).replay = false; % replay trial?
+trialtype(5).replayminmax = [3 6]; % min/max epoch duration
 
 % endogenous dots trial - track other direction
 trialtype(6).stimsize = [4 4]; % which stimuli [left right]
@@ -239,6 +249,8 @@ trialtype(6).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(6).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(6).time.StimT = 5; %s stimulus duration
 trialtype(6).time.ITIT  = 1; %s intertrial interval
+trialtype(6).replay = false; % replay trial?
+trialtype(6).replayminmax = [3 6]; % min/max epoch duration
 
 % endogenous dots trial - eyes changed
 trialtype(7).stimsize = [4 4]; % which stimuli [left right]
@@ -252,6 +264,8 @@ trialtype(7).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(7).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(7).time.StimT = 1; %s stimulus duration
 trialtype(7).time.ITIT  = 1; %s intertrial interval
+trialtype(7).replay = false; % replay trial?
+trialtype(7).replayminmax = [3 6]; % min/max epoch duration
 
 % endogenous dots trial - eyes changed + track other direction
 trialtype(8).stimsize = [4 4]; % which stimuli [left right]
@@ -265,6 +279,8 @@ trialtype(8).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(8).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(8).time.StimT = 1; %s stimulus duration
 trialtype(8).time.ITIT  = 1; %s intertrial interval
+trialtype(8).replay = false; % replay trial?
+trialtype(8).replayminmax = [3 6]; % min/max epoch duration
 
 % endogenous dots catch trial
 trialtype(9).stimsize = [4 4]; % which stimuli [left right]
@@ -278,6 +294,8 @@ trialtype(9).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(9).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(9).time.StimT = 5; %s stimulus duration
 trialtype(9).time.ITIT  = 1; %s intertrial interval
+trialtype(9).replay = false; % replay trial?
+trialtype(9).replayminmax = [3 6]; % min/max epoch duration
 
 % endogenous dots catch trial - track other direction
 trialtype(10).stimsize = [4 4]; % which stimuli [left right]
@@ -291,7 +309,8 @@ trialtype(10).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(10).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(10).time.StimT = 1; %s stimulus duration
 trialtype(10).time.ITIT  = 1; %s intertrial interval
-
+trialtype(10).replay = false; % replay trial?
+trialtype(10).replayminmax = [3 6]; % min/max epoch duration
 
 % endogenous dots catch trial - stimuli moving to direction
 trialtype(11).stimsize = [4 4]; % which stimuli [left right]
@@ -305,6 +324,8 @@ trialtype(11).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(11).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(11).time.StimT = 1; %s stimulus duration
 trialtype(11).time.ITIT  = 1; %s intertrial interval
+trialtype(12).replay = false; % replay trial?
+trialtype(12).replayminmax = [3 6]; % min/max epoch duration
 
 % endogenous dots catch trial - stimuli moving to direction + track other
 % direction
@@ -319,6 +340,8 @@ trialtype(12).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(12).time.PrestimGapT = 0.5; %s between prestim and stim
 trialtype(12).time.StimT = 1; %s stimulus duration
 trialtype(12).time.ITIT  = 1; %s intertrial interval
+trialtype(12).replay = false; % replay trial?
+trialtype(12).replayminmax = [3 6]; % min/max epoch duration
 
 % blocks --
 % button-press report

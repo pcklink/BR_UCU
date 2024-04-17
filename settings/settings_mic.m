@@ -219,6 +219,8 @@ trialtype(1).time.PrestimT = []; %s leave empty or set zero for none
 trialtype(1).time.PrestimGapT = 1; %s between prestim and stim
 trialtype(1).time.StimT = 5; %s stimulus duration
 trialtype(1).time.ITIT  = 1; %s intertrial interval
+trialtype(1).replay = false; % replay trial?
+trialtype(1).replayminmax = [3 6]; % min/max epoch duration
 
 % blocks --
 block(1).reportmode = 'key'; % key/verbal/none

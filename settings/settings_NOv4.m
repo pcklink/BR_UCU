@@ -100,6 +100,8 @@ trialtype(1).time.PrestimT = []; %s leave empty or set zero for none
 trialtype(1).time.PrestimGapT = 0; %s between prestim and stim
 trialtype(1).time.StimT = 5; %s stimulus duration
 trialtype(1).time.ITIT  = 0; %s intertrial interval
+trialtype(1).replay = true; % replay trial?
+trialtype(1).replayminmax = [3 6]; % min/max epoch duration
 
 % trials: simulated rivalry 2 
 trialtype(2).stimsize = [4 4]; % wchich stimuli [left right]
@@ -113,6 +115,8 @@ trialtype(2).time.PrestimT = []; %s leave empty or set zero for none
 trialtype(2).time.PrestimGapT = 0; %s between prestim and stim
 trialtype(2).time.StimT = 5; %s stimulus duration
 trialtype(2).time.ITIT  = 0; %s intertrial interval
+trialtype(2).replay = true; % replay trial?
+trialtype(2).replayminmax = [3 6]; % min/max epoch duration
 
 % trials: real rivalry  
 trialtype(3).stimsize = [4 4]; % wchich stimuli [left right]
@@ -126,6 +130,8 @@ trialtype(3).time.PrestimT = []; %s leave empty or set zero for none
 trialtype(3).time.PrestimGapT = 0; %s between prestim and stim
 trialtype(3).time.StimT = 120; %s stimulus duration
 trialtype(3).time.ITIT  = 0; %s intertrial interval
+trialtype(3).replay = false; % replay trial?
+trialtype(3).replayminmax = [3 6]; % min/max epoch duration
 
 %% 
 % block: key report 

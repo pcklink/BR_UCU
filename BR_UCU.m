@@ -921,19 +921,41 @@ try
 
             %% STIM ---
             % the main stimulus phase
-            StimStarted = 0;
+            StimStarted = 0; EpochStarted = 0;
             StimT0 = 0; vbl = 0; cF = 0;
             keys.KeyWasDown = false;
             keys.KeyIsDown = false;
             keys.LastKey = [];
+            keys.PrevKey = [];
+            NewEpoch = true; NewEpochT = false;
+            replaystim = ceil(2*rand(1)); % random 1 or 2
             %fprintf('Starting stim\n')
 
             while vbl-StimStarted < trialtype(T).time.StimT  && ~StopExp
+                if trialtype(T).replay 
+                    if ~StimStarted || NewEpoch
+                        CurrEpochDur = trialtype(T).replay(1) + ...
+                            (trialtype(T).replay(2)-trialtype(T).replay(1))*rand(1);
+                        NewEpoch = false; NewEpochT = true;
+                        if replaystim == 1
+                            replaystim = 2;
+                        elseif replaystim == 2
+                            replaystim = 1;
+                        end
+                        si = [replaystim replaystim];
+                    else
+                        NewEpochT = false;
+                    end
+                else
+                    si = [1 2];
+                end
+                
+                
                 % stim
                 for fb = [0 1]
                     DrawBackground(monitor, fb, bg);
                     % which stim
-                    ss = trialtype(T).eye(fb+1).stim;
+                    ss = trialtype(T).eye(si(fb+1)).stim;
                     switch stim(ss).type
                         case 'grating'
                             % - get rect
@@ -1187,6 +1209,23 @@ try
                         EThndl.sendMessage('StimStart',vbl)
                     end
                     StimStarted = vbl;
+                    if trialtype(T).replay 
+                        EpochStarted = vbl;
+                    end
+                end
+
+                if trialtype(T).replay  && NewEpochT
+                    EpochStarted = vbl;
+                    % log
+                    log.ev = [log.ev; {vbl,'EpochStart',[T si(fb+1)]}];
+                    if eyetracker.do
+                        EThndl.sendMessage('EpochStart',vbl)
+                    end
+                end
+
+                if trialtype(T).replay && ...
+                        vbl - EpochStarted >= CurrEpochDur
+                    NewEpoch = true;
                 end
 
                 % get keypresses
@@ -1198,8 +1237,11 @@ try
                         EThndl.sendMessage('KeyStop',secs)
                     end
                     break;
+                elseif keys.LogKeyRelease
+                    log.ev = [log.ev; {keys.secs,'KeyRelease',keys.PrevKey}];
                 elseif keys.LogNewKey
                     log.ev = [log.ev; {keys.secs,'KeyPress',keys.LastKey}];
+                    keys.PrevKey = keys.LastKey;
                 end
 
                 % Can we fetch the mic buffer every screen refresh? --
@@ -1394,21 +1436,26 @@ end
             keys.LastKey = KbName(find(keys.keyCode)); % Get the name of the pressed key
             keys.KeyWasDown = true;
             keys.LogNewKey = true;
+            keys.LogKeyRelease = false;
         elseif keys.KeyIsDown && keys.KeyWasDown % still holding key
             if strcmp(keys.LastKey, KbName(find(keys.keyCode)))
                 if keys.LastKey ~= KbName(find(keys.keyCode))
                     keys.LastKey = KbName(find(keys.keyCode));
                     keys.LogNewKey = true;
+                    keys.LogKeyRelease = true;
                 else
                     keys.LogNewKey = false;
+                    keys.LogKeyRelease = false;
                 end
             end
         elseif ~keys.KeyIsDown && keys.KeyWasDown % stop holding key
             keys.LastKey = 'none';
             keys.LogNewKey = false;
+            keys.LogKeyRelease = true;
             keys.KeyWasDown = false;
         else
             keys.LogNewKey = false;
+            keys.LogKeyRelease = false;
         end
     end
 
