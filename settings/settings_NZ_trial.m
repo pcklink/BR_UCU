@@ -87,7 +87,7 @@ prestim(1).driftspeed = [-1.2 0; 1.2 0]; % deg/s positive is rightward [dots1 do
 prestim(1).transient.contrastincr = 0.6; % change in contrast for exogenous attention
 prestim(1).transient.stim = 1; % which stim gets the transient
 prestim(1).transient.duration = 0.200; % how long is the contrast change
-prestim(1).transient.timewindow = [-0.4 -0.25]; % when can it happen relative to end of prestim [max min]
+prestim(1).transient.timewindow = [-0.4 -0.2]; % when can it happen relative to end of prestim [max min]
 prestim(1).instruct = ['Fix your gaze on the red dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
 prestim(1).quest = 'Left or Right'; % question text after the prestim (key-press left/right is logged)
 
@@ -104,7 +104,7 @@ prestim(2).driftspeed = [-1.2 0; 1.2 0]; % deg/s positive is rightward [dots1 do
 prestim(2).transient.contrastincr = 0.6; % change in contrast for exogenous attention
 prestim(2).transient.stim = 2; % which stim gets the transient
 prestim(2).transient.duration = 0.200; % how long is the contrast change
-prestim(2).transient.timewindow = [-0.4 -0.25]; % when can it happen relative to end of prestim [max min]
+prestim(2).transient.timewindow = [-0.4 -0.2]; % when can it happen relative to end of prestim [max min]
 prestim(2).instruct = ['Fix your gaze on the red dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
 prestim(2).quest = 'Left or Right'; % question text after the prestim (key-press left/right is logged)
 
@@ -195,6 +195,7 @@ trialtype(1).replayminmax = [3 6]; % min/max epoch duration
 
 % exogenous dots trial - eyes changed
 trialtype(2) = trialtype(1); % inititate copy, then change necessary things
+trialtype(2).stimsize = [4 4]; % which stimuli [left right]
 trialtype(2).prestim = 1; % which prestim
 trialtype(2).eye(1).stim = 2; % stim for eye1
 trialtype(2).eye(2).stim = 1; % stim for eye2
@@ -207,7 +208,7 @@ trialtype(2).time.StimT = 1.5; %s stimulus duration
 trialtype(2).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots catch trial
-trialtype(3) = trialtype(2); % inititate copy, then change necessary things
+trialtype(3) = trialtype(1); % inititate copy, then change necessary things
 trialtype(3).stimsize = [2 2]; % which stimuli [left right]
 trialtype(3).prestim = 1; % which prestim
 trialtype(3).eye(1).stim = 1; % stim for eye1
@@ -222,21 +223,38 @@ trialtype(3).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots catch trial
 % stim other direction
-trialtype(4) = trialtype(2); % inititate copy, then change necessary things
+trialtype(4) = trialtype(1); % inititate copy, then change necessary things
+trialtype(4).stimsize = [4 4]; % which stimuli [left right]
 trialtype(4).prestim = 1; % which prestim
 trialtype(4).eye(1).stim = 2; % stim for eye1
 trialtype(4).eye(2).stim = 2; % stim for eye2
+% Choose timing consistent with 60Hz refresh rate
+% so multiples of 1/60 s
+trialtype(4).time.FixT = 0.5; %s time without stimus / with alignment
+trialtype(4).time.PrestimT = 3; %s leave empty or set zero for none
+trialtype(4).time.PrestimGapT = 0.25; %s between prestim and stim
+trialtype(4).time.StimT = 1.5; %s stimulus duration
+trialtype(4).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots trial
 % prestim contrast increment other direction
-trialtype(5) = trialtype(2); % inititate copy, then change necessary things
+trialtype(5) = trialtype(1); % inititate copy, then change necessary things
+trialtype(5).stimsize = [4 4]; % which stimuli [left right]
 trialtype(5).prestim = 2; % which prestim
 trialtype(5).eye(1).stim = 1; % stim for eye1
 trialtype(5).eye(2).stim = 2; % stim for eye2
+% Choose timing consistent with 60Hz refresh rate
+% so multiples of 1/60 s
+trialtype(5).time.FixT = 0.5; %s time without stimus / with alignment
+trialtype(5).time.PrestimT = 3; %s leave empty or set zero for none
+trialtype(5).time.PrestimGapT = 0.25; %s between prestim and stim
+trialtype(5).time.StimT = 1.5; %s stimulus duration
+trialtype(5).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots trial 
 % eyes changed + contrast increment for other direction
-trialtype(6) = trialtype(2); % inititate copy, then change necessary things
+trialtype(6) = trialtype(1); % inititate copy, then change necessary things
+trialtype(6).stimsize = [4 4]; % which stimuli [left right]
 trialtype(6).prestim = 2; % which prestim
 trialtype(6).eye(1).stim = 2; % stim for eye1
 trialtype(6).eye(2).stim = 1; % stim for eye2
@@ -250,7 +268,8 @@ trialtype(6).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots catch trial
 % contrast increment for other direction
-trialtype(7) = trialtype(2); % inititate copy, then change necessary things
+trialtype(7) = trialtype(1); % inititate copy, then change necessary things
+trialtype(7).stimsize = [4 4]; % which stimuli [left right]
 trialtype(7).prestim = 2; % which prestim
 trialtype(7).eye(1).stim = 1; % stim for eye1
 trialtype(7).eye(2).stim = 1; % stim for eye2
@@ -264,7 +283,8 @@ trialtype(7).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots catch trial 
 % stim other direction + prestim contrast increment other direction
-trialtype(8) = trialtype(2); % inititate copy, then change necessary things
+trialtype(8) = trialtype(1); % inititate copy, then change necessary things
+trialtype(8).stimsize = [4 4]; % which stimuli [left right]
 trialtype(8).prestim = 2; % which prestim
 trialtype(8).eye(1).stim = 2; % stim for eye1
 trialtype(8).eye(2).stim = 2; % stim for eye2
@@ -277,7 +297,7 @@ trialtype(8).time.StimT = 1.5; %s stimulus duration
 trialtype(8).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots trial
-trialtype(9) = trialtype(2); % inititate copy, then change necessary things
+trialtype(9) = trialtype(1); % inititate copy, then change necessary things
 trialtype(9).stimsize = [2 2]; % which stimuli [left right]
 trialtype(9).prestim = 3; % which prestim
 trialtype(9).eye(1).stim = 1; % stim for eye1
@@ -292,7 +312,8 @@ trialtype(9).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots trial
 % track other direction
-trialtype(10) = trialtype(2); % inititate copy, then change necessary things
+trialtype(10) = trialtype(1); % inititate copy, then change necessary things
+trialtype(10).stimsize = [4 4]; % which stimuli [left right]
 trialtype(10).prestim = 4; % which prestim
 trialtype(10).eye(1).stim = 1; % stim for eye1
 trialtype(10).eye(2).stim = 2; % stim for eye2
@@ -306,7 +327,8 @@ trialtype(10).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots trial 
 % eyes changed
-trialtype(11) = trialtype(2); % inititate copy, then change necessary things
+trialtype(11) = trialtype(1); % inititate copy, then change necessary things
+trialtype(11).stimsize = [4 4]; % which stimuli [left right]
 trialtype(11).prestim = 3; % which prestim
 trialtype(11).eye(1).stim = 2; % stim for eye1
 trialtype(11).eye(2).stim = 1; % stim for eye2
@@ -320,7 +342,8 @@ trialtype(11).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots trial 
 % eyes changed + track other direction
-trialtype(12) = trialtype(2); % inititate copy, then change necessary things
+trialtype(12) = trialtype(1); % inititate copy, then change necessary things
+trialtype(12).stimsize = [4 4]; % which stimuli [left right]
 trialtype(12).prestim = 4; % which prestim
 trialtype(12).eye(1).stim = 2; % stim for eye1
 trialtype(12).eye(2).stim = 1; % stim for eye2
@@ -333,7 +356,7 @@ trialtype(12).time.StimT = 1.5; %s stimulus duration
 trialtype(12).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots catch trial
-trialtype(13) = trialtype(2); % inititate copy, then change necessary things
+trialtype(13) = trialtype(1); % inititate copy, then change necessary things
 trialtype(13).stimsize = [2 2]; % which stimuli [left right]
 trialtype(13).prestim = 3; % which prestim
 trialtype(13).eye(1).stim = 1; % stim for eye1
@@ -348,7 +371,8 @@ trialtype(13).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots catch trial 
 % track other direction
-trialtype(14) = trialtype(2); % inititate copy, then change necessary things
+trialtype(14) = trialtype(1); % inititate copy, then change necessary things
+trialtype(14).stimsize = [4 4]; % which stimuli [left right]
 trialtype(14).prestim = 4; % which prestim
 trialtype(14).eye(1).stim = 1; % stim for eye1
 trialtype(14).eye(2).stim = 1; % stim for eye2
@@ -363,7 +387,8 @@ trialtype(14).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots catch trial 
 % stimuli moving to direction
-trialtype(15) = trialtype(2); % inititate copy, then change necessary things
+trialtype(15) = trialtype(1); % inititate copy, then change necessary things
+trialtype(15).stimsize = [4 4]; % which stimuli [left right]
 trialtype(15).prestim = 3; % which prestim
 trialtype(15).eye(1).stim = 2; % stim for eye1
 trialtype(15).eye(2).stim = 2; % stim for eye2
@@ -377,7 +402,8 @@ trialtype(15).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots catch trial 
 % stimuli moving to direction + track other direction
-trialtype(16) = trialtype(2); % inititate copy, then change necessary things
+trialtype(16) = trialtype(1); % inititate copy, then change necessary things
+trialtype(16).stimsize = [4 4]; % which stimuli [left right]
 trialtype(16).prestim = 4; % which prestim
 trialtype(16).eye(1).stim = 2; % stim for eye1
 trialtype(16).eye(2).stim = 2; % stim for eye2
