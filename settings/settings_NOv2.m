@@ -109,6 +109,8 @@ trialtype(1).eye(1).stim = 1; % stim for eye1
 trialtype(1).eye(2).stim = 2; % stim for eye2
 trialtype(1).replay = false; % replay trial?
 trialtype(1).replayminmax = [3 6]; % min/max epoch duration
+trialtype(1).poststimquest = []; % question text after the prestim (ke-press left/right is logged)
+% leave empty for none
 
 % simulated rivalry 2
 trialtype(2).stimsize = [4 4]; % wchich stimuli [left right]
@@ -117,6 +119,7 @@ trialtype(2).eye(1).stim = 2; % stim for eye1
 trialtype(2).eye(2).stim = 1; % stim for eye2
 trialtype(2).replay = false; % replay trial?
 trialtype(2).replayminmax = [3 6]; % min/max epoch duration
+trialtype(2).poststimquest = []; % question text after the prestim (ke-press left/right is logged)
 
 %% key press
 

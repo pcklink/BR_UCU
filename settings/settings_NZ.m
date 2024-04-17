@@ -222,6 +222,8 @@ trialtype(1).time.StimT = 1; %s stimulus duration
 trialtype(1).time.ITIT  = 1; %s intertrial interval
 trialtype(1).replay = false; % replay trial?
 trialtype(1).replayminmax = [3 6]; % min/max epoch duration
+trialtype(1).poststimquest = []; % question text after the prestim (ke-press left/right is logged)
+% leave empty for none
 
 % exogenous dots trial - eyes changed
 trialtype(2) = trialtype(1); % inititate copy, then change necessary things

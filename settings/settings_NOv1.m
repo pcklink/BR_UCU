@@ -183,6 +183,8 @@ trialtype(1).eye(1).stim = 1; % stim for eye1
 trialtype(1).eye(2).stim = 2; % stim for eye2
 trialtype(1).replay = false; % replay trial?
 trialtype(1).replayminmax = [3 6]; % min/max epoch duration
+trialtype(1).poststimquest = []; % question text after the prestim (ke-press left/right is logged)
+% leave empty for none
 
 % blocks --
 block(1).reportmode = 'key'; % key/verbal/none

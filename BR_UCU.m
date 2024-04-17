@@ -526,7 +526,6 @@ try
                             round(prestim(ps).transient.duration*monitor.refreshRate)];
                 end
 
-
                 % instruction screen --
                 % tell your participants what to do
                 for fb = [0 1] % both framebuffers for stereomode
@@ -1262,6 +1261,36 @@ try
             end
             StimStarted = true;
 
+            % Do a response moment if requested
+            if ~isempty(trialtype(T).poststimquest)
+                for fb = [0 1] % both framebuffers for stereomode
+                    % BG
+                    DrawBackground(monitor, fb, bg);
+                    % text
+                    DrawFormattedText(monitor.w,trialtype(T).poststimquest, ...
+                        'center','center',bg.textcolor);
+                end
+                Screen('DrawingFinished',monitor.w);
+                vbl = Screen('Flip', monitor.w);
+
+                % wait for key response
+                RespLogged = false;
+                while  ~RespLogged
+                    [KeyIsDown,keys.secs,keys.keyCode] = KbCheck;
+                    if KeyIsDown
+                        keys.LastKey = KbName(find(keys.keyCode)); % Get the name of the pressed key
+                        if strcmp(keys.LastKey,keys.resp{1}) || strcmp(keys.LastKey,keys.resp{2})
+                            log.ev = [log.ev; {keys.secs,'PostStimResponse',keys.LastKey}];
+                            RespLogged = true;
+                        elseif strcmp(keys.LastKey,keys.esc)
+                            RespLogged = true;
+                            StopExp = true;
+                            break;
+                        end
+                    end
+                end
+            end
+
             % stop audio capture
             if sound.recordmic
                 % Stop audio capture --
@@ -1288,7 +1317,9 @@ try
                     psychwavwrite(transpose(log.block(b).trial(t).voicetrack), sndfreq, 16, sndfile)
                 end
             end
+            
             t=t+1; % next trial
+
 
             %% ITI ---
             % intertrial interval
@@ -1333,7 +1364,7 @@ try
     if eyetracker.do
         EThndl.buffer.stop('gaze'); % close the buffer
         fn = ['eyedata_' log.Label]; % create a label
-        EThndl.saveData(fullfile(log.fld,log.Label,fn), true); % save
+        EThndl.saveData(fullfile(RunPath,log.fld,log.Label,fn), true); % save
         EThndl.deInit(); % shut down
     end
 
@@ -1361,7 +1392,7 @@ catch
     %% Error handling
     psychrethrow(psychlasterror);
     Screen('LoadNormalizedGammaTable', monitor.w, monitor.OLD_Gamtable);
-    sca; ShowCursor;
+    sca; ListenChar(); ShowCursor;
 end
 
 %% Repeating functions

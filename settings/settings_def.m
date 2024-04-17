@@ -221,6 +221,8 @@ trialtype(1).time.StimT = 5; %s stimulus duration
 trialtype(1).time.ITIT  = 1; %s intertrial interval
 trialtype(1).replay = false; % replay trial?
 trialtype(1).replayminmax = [3 6]; % min/max epoch duration
+trialtype(1).poststimquest = []; % question text after the prestim (ke-press left/right is logged)
+% leave empty for none
 
 % blocks --
 block(1).reportmode = 'key'; % key/verbal/none
