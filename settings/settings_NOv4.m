@@ -104,22 +104,13 @@ trialtype(1).replay = true; % replay trial?
 trialtype(1).replayminmax = [3 6]; % min/max epoch duration
 
 % trials: simulated rivalry 2 
-trialtype(2).stimsize = [4 4]; % wchich stimuli [left right]
+trialtype(2) = trialtype(1); % inititate copy, then change necessary things
 trialtype(2).prestim = 2; % whic prestim
 trialtype(2).eye(1).stim = 2; % stim for eye1
 trialtype(2).eye(2).stim = 1; % stim for eye2
-% Choose timing consistent with 60Hz refresh rate
-% so multiples of 1/60 s
-trialtype(2).time.FixT = 0; %s time without stimus / with alignment
-trialtype(2).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(2).time.PrestimGapT = 0; %s between prestim and stim
-trialtype(2).time.StimT = 5; %s stimulus duration
-trialtype(2).time.ITIT  = 0; %s intertrial interval
-trialtype(2).replay = true; % replay trial?
-trialtype(2).replayminmax = [3 6]; % min/max epoch duration
 
 % trials: real rivalry  
-trialtype(3).stimsize = [4 4]; % wchich stimuli [left right]
+trialtype(3) = trialtype(1); % inititate copy, then change necessary things
 trialtype(3).prestim = 2; % whic prestim
 trialtype(3).eye(1).stim = 1; % stim for eye1
 trialtype(3).eye(2).stim = 2; % stim for eye2
