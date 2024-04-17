@@ -35,7 +35,7 @@ sound.mic.device = []; % auto if empty, only necessary if multiple are present
 sound.beepfile = 'beep.wav'; % should be in root folder; plays as marker
 
 % keys ---
-keys.esc = 'ESCAPE'; % escapes stops the experimeError using Titta/saveData
+keys.esc = 'ESCAPE'; % escapes stops the experiment
 keys.resp = {'LeftArrow','RightArrow'}; % use arrow keys for responses
 
 % log location ---
@@ -60,7 +60,7 @@ bg.textcolor = [1 1 1]; % [R G B]
 % there is a fame and crosshair around the stimulus to help alignment
 bg.align.Frame.Type = 0; % 0 = oval, 1 = rectangle
 bg.align.Frame.PenWidth = .2; % in deg
-bg.align.Frame.CrossLength = [2 2]; % in deg
+bg.align.Frame.CrossLength = [6 6]; % in deg
 bg.align.Frame.Color = [0 0 0]; % [R G B] range: 0-1
 % There can be alignment 'bubbles' in the background to help alignment
 bg.align.AlignCircles.draw = true; % if false these are not drawn
@@ -71,14 +71,14 @@ bg.align.AlignCircles.OpenArea = [8 8]; % in deg
 
 % fixation dot
 fix.size = 0.2; % dva diameter
-fix.color = [0 0 1]; % [R G B]
+fix.color = [1 0 0]; % [R G B]
 
 % ---------------------------------------------
 %% prestimulus adapt/cue (can be omitted) --
 prestim(1).type = 'dots'; % stimulus type
 prestim(1).attentiontype = 'exogenous'; % exogenous/endogenous
-prestim(1).dotsize = 0.2; % deg (there may be GPU based limitations)
-prestim(1).dotdensity = 2; % dots/deg2
+prestim(1).dotsize = 0.25; % deg (there may be GPU based limitations)
+prestim(1).dotdensity = 3; % dots/deg2
 prestim(1).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 prestim(1).contrast = 0.3; % contrast of the dots
 prestim(1).contrastbin = true; % if true all dots have either the min or max value of the contrast
@@ -86,16 +86,16 @@ prestim(1).color = []; % leave empty for luminance contrast
 prestim(1).driftspeed = [-1.2 0; 1.2 0]; % deg/s positive is rightward [dots1 dots2]
 prestim(1).transient.contrastincr = 0.6; % change in contrast for exogenous attention
 prestim(1).transient.stim = 1; % which stim gets the transient
-prestim(1).transient.duration = 0.200; % how long is the contrast change
-prestim(1).transient.timewindow = [-0.4 -0.25]; % when can it happen relative to end of prestim [max min]
+prestim(1).transient.duration = 0.100; % how long is the contrast change
+prestim(1).transient.timewindow = [-0.3 -0.1]; % when can it happen relative to end of prestim [max min]
 prestim(1).instruct = ['Fix your gaze on the red dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
-prestim(1).quest = 'Left or Right'; % question text after the prestim (key-press left/right is logged)
+% prestim(1).quest = 'Left or Right'; % question text after the prestim (key-press left/right is logged)
 
 % prestim for exo dots - contrast increment for other direction
 prestim(2).type = 'dots'; % stimulus type
 prestim(2).attentiontype = 'exogenous'; % exogenous/endogenous
-prestim(2).dotsize = 0.2; % deg (there may be GPU based limitations)
-prestim(2).dotdensity = 2; % dots/deg2
+prestim(2).dotsize = 0.25; % deg (there may be GPU based limitations)
+prestim(2).dotdensity = 3; % dots/deg2
 prestim(2).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 prestim(2).contrast = 0.3; % contrast of the dots
 prestim(2).contrastbin = true; % if true all dots have either the min or max value of the contrast
@@ -103,60 +103,60 @@ prestim(2).color = []; % leave empty for luminance contrast
 prestim(2).driftspeed = [-1.2 0; 1.2 0]; % deg/s positive is rightward [dots1 dots2]
 prestim(2).transient.contrastincr = 0.6; % change in contrast for exogenous attention
 prestim(2).transient.stim = 2; % which stim gets the transient
-prestim(2).transient.duration = 0.200; % how long is the contrast change
-prestim(2).transient.timewindow = [-0.4 -0.25]; % when can it happen relative to end of prestim [max min]
+prestim(2).transient.duration = 0.100; % how long is the contrast change
+prestim(2).transient.timewindow = [-0.3 -0.1]; % when can it happen relative to end of prestim [max min]
 prestim(2).instruct = ['Fix your gaze on the red dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
-prestim(2).quest = 'Left or Right'; % question text after the prestim (key-press left/right is logged)
+% prestim(2).quest = 'Left or Right'; % question text after the prestim (key-press left/right is logged)
 
 % for endogenous dots prestim
 % show transparent moving dots that change in direction over time
 prestim(3).type = 'dots';  % stimulus type
 prestim(3).attentiontype = 'endogenous'; % exogenous/endogenous
-prestim(3).dotsize = 0.2; % deg (there may be GPU based limitations)
-prestim(3).dotdensity = 2; % dots/deg2
+prestim(3).dotsize = 0.25; % deg (there may be GPU based limitations)
+prestim(3).dotdensity = 3; % dots/deg2
 prestim(3).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 prestim(3).contrast = 0.8; % contrast 0-1
 prestim(3).contrastbin = true; % if true all dots have either the min or max value of the contrast
 prestim(3).color = [1 0 0;0 1 0]; % leave empty for luminance contrast [R1 G1 B1; R2 G2 B2]
-prestim(3).orientations = [-135 -135; -45 -45]; % drift angle degrees clockwise [start_stim1 end_stim1; start_stim2 end_stim2]
+prestim(3).orientations = [-45 -45; 45 45]; % drift angle degrees clockwise [start_stim1 end_stim1; start_stim2 end_stim2]
 % orientations is not used for dots
 prestim(3).driftspeed = [-1.2 0; 1.2 0]; % deg/s positive is rightward/down [H1 V1;H2 V2]
 prestim(3).trackstim = 1; % which stimulus should be tracked
-prestim(3).change.degpersec = 0.8; % deg/sec (choose integer frame counts
-prestim(3).change.interval = [0.5 2]; % how long can a period of same direction change last [min max]
+prestim(3).change.degpersec = 2; % deg/sec (choose integer frame counts
+prestim(3).change.interval = [0.5 1.5]; % how long can a period of same direction change last [min max]
 prestim(3).change.prob = 0.05; % probability of direction change
 prestim(3).instruct = 'Attend dots moving LEFT\npress key to start'; % question text after the prestim (ke-press left/right is logged)
 prestim(3).quest = 'Did you follow dots moving\nLeft\nor\nRight?'; % [static rotating static] in seconds
-prestim(3).durations = [1 4 1]; %[static rotating static]
+prestim(3).durations = [1 5 0]; %[static rotating static]
 % NB! make sure these durations add up to trialtime.PrestimT
 
 % for endogenous dots prestim -> track other stimulus
 % show transparent moving dots that change in direction over time
 prestim(4).type = 'dots';  % stimulus type
 prestim(4).attentiontype = 'endogenous'; % exogenous/endogenous
-prestim(4).dotsize = 0.2; % deg (there may be GPU based limitations)
-prestim(4).dotdensity = 2; % dots/deg2
+prestim(4).dotsize = 0.25; % deg (there may be GPU based limitations)
+prestim(4).dotdensity = 3; % dots/deg2
 prestim(4).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 prestim(4).contrast = 0.8; % contrast 0-1
 prestim(4).contrastbin = true; % if true all dots have either the min or max value of the contrast
 prestim(4).color = [1 0 0;0 1 0]; % leave empty for luminance contrast [R1 G1 B1; R2 G2 B2]
-prestim(4).orientations = [-135 -135; -45 -45]; % drift angle degrees clockwise [start_stim1 end_stim1; start_stim2 end_stim2]
+prestim(4).orientations = [-45 -45; 45 45]; % drift angle degrees clockwise [start_stim1 end_stim1; start_stim2 end_stim2]
 % orientations is not used for dots
 prestim(4).driftspeed = [-1.2 0; 1.2 0]; % deg/s positive is rightward/down [H1 V1;H2 V2]
 prestim(4).trackstim = 2; % which stimulus should be tracked
-prestim(4).change.degpersec = 0.8; % deg/sec (choose integer frame counts
-prestim(4).change.interval = [0.5 2]; % how long can a period of same direction change last [min max]
+prestim(4).change.degpersec = 2; % deg/sec (choose integer frame counts
+prestim(4).change.interval = [0.5 1.5]; % how long can a period of same direction change last [min max]
 prestim(4).change.prob = 0.05; % probability of direction change
 prestim(4).instruct = 'Attend dots moving RIGHT\npress key to start'; % question text after the prestim (ke-press left/right is logged)
 prestim(4).quest = 'Did you follow dots moving\nLeft\nor\nRight?'; % [static rotating static] in seconds
-prestim(4).durations = [1 4 1]; %[static rotating static]
+prestim(4).durations = [1 5 0]; %[static rotating static]
 % NB! make sure these durations add up to trialtime.PrestimT
 
 % ---------------------------------------------
 
 %% stimulus --
 stim(1).type = 'dots'; % stimulus type
-stim(1).dotsize = 0.2; % deg
+stim(1).dotsize = 0.25; % deg
 stim(1).dotdensity = 3; % dots/deg2
 stim(1).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 stim(1).contrast = 1;  % contrast 0-1
@@ -165,7 +165,7 @@ stim(1).color = []; % leave empty for luminance contrast
 stim(1).driftspeed = [1.2 0]; % [h v] deg/s positive is rightward/down
 
 stim(2).type = 'dots'; % stimulus type
-stim(2).dotsize = 0.2; % deg
+stim(2).dotsize = 0.25; % deg
 stim(2).dotdensity = 3; % dots/deg2
 stim(2).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 stim(2).contrast = 1;  % contrast 0-1
@@ -179,16 +179,16 @@ stim(2).driftspeed = [-1.2 0]; % [h v] deg/s positive is rightward/down
 
 % trials --
 % exogenous dots trial
-trialtype(1).stimsize = [2 2]; % which stimuli [left right]
+trialtype(1).stimsize = [4 4]; % which stimuli [left right]
 trialtype(1).prestim = 1; % which prestim
 trialtype(1).eye(1).stim = 1; % stim for eye1
 trialtype(1).eye(2).stim = 2; % stim for eye2
 % Choose timing consistent with 60Hz refresh rate
 % so multiples of 1/60 s
-trialtype(1).time.FixT = 0; %s time without stimus / with alignment
+trialtype(1).time.FixT = 0.5; %s time without stimus / with alignment
 trialtype(1).time.PrestimT = 3; %s leave empty or set zero for none
 trialtype(1).time.PrestimGapT = 0.25; %s between prestim and stim
-trialtype(1).time.StimT = 2; %s stimulus duration
+trialtype(1).time.StimT = 1.5; %s stimulus duration
 trialtype(1).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots trial - eyes changed
@@ -205,7 +205,7 @@ trialtype(2).time.StimT = 1.5; %s stimulus duration
 trialtype(2).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots catch trial
-trialtype(3).stimsize = [2 2]; % which stimuli [left right]
+trialtype(3).stimsize = [4 4]; % which stimuli [left right]
 trialtype(3).prestim = 1; % which prestim
 trialtype(3).eye(1).stim = 1; % stim for eye1
 trialtype(3).eye(2).stim = 1; % stim for eye2
@@ -214,7 +214,7 @@ trialtype(3).eye(2).stim = 1; % stim for eye2
 trialtype(3).time.FixT = 0.5; %s time without stimus / with alignment
 trialtype(3).time.PrestimT = 3; %s leave empty or set zero for none
 trialtype(3).time.PrestimGapT = 0.25; %s between prestim and stim
-trialtype(3).time.StimT = 2; %s stimulus duration
+trialtype(3).time.StimT = 1.5; %s stimulus duration
 trialtype(3).time.ITIT  = 0.5; %s intertrial interval
 
 % exogenous dots catch trial
@@ -288,7 +288,7 @@ trialtype(8).time.StimT = 1.5; %s stimulus duration
 trialtype(8).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots trial
-trialtype(9).stimsize = [2 2]; % which stimuli [left right]
+trialtype(9).stimsize = [4 4]; % which stimuli [left right]
 trialtype(9).prestim = 3; % which prestim
 trialtype(9).eye(1).stim = 1; % stim for eye1
 trialtype(9).eye(2).stim = 2; % stim for eye2
@@ -297,7 +297,7 @@ trialtype(9).eye(2).stim = 2; % stim for eye2
 trialtype(9).time.FixT = 0.5; %s time without stimus / with alignment
 trialtype(9).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(9).time.PrestimGapT = 0.25; %s between prestim and stim
-trialtype(9).time.StimT = 2; %s stimulus duration
+trialtype(9).time.StimT = 1.5; %s stimulus duration
 trialtype(9).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots trial
@@ -343,7 +343,7 @@ trialtype(12).time.StimT = 1.5; %s stimulus duration
 trialtype(12).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots catch trial
-trialtype(13).stimsize = [2 2]; % which stimuli [left right]
+trialtype(13).stimsize = [4 4]; % which stimuli [left right]
 trialtype(13).prestim = 3; % which prestim
 trialtype(13).eye(1).stim = 1; % stim for eye1
 trialtype(13).eye(2).stim = 1; % stim for eye2
@@ -352,7 +352,7 @@ trialtype(13).eye(2).stim = 1; % stim for eye2
 trialtype(13).time.FixT = 0.5; %s time without stimus / with alignment
 trialtype(13).time.PrestimT = 6; %s leave empty or set zero for none
 trialtype(13).time.PrestimGapT = 0.25; %s between prestim and stim
-trialtype(13).time.StimT = 2; %s stimulus duration
+trialtype(13).time.StimT = 1.5; %s stimulus duration
 trialtype(13).time.ITIT  = 0.5; %s intertrial interval
 
 % endogenous dots catch trial 
@@ -401,14 +401,14 @@ trialtype(16).time.ITIT  = 0.5; %s intertrial interval
 % blocks --
 % button-press report
 block(1).reportmode = 'key'; % key/verbal/none
-block(1).trials = [1 9]; % which trialtypes in the block
+block(1).trials = [1 2 5 6 9 10 11 12]; % which trialtypes in the block
 block(1).randomizetrials = true; % randomize in block
-block(1).repeattrials = 0; % repeat trial sets this many times
+block(1).repeattrials = 2; % repeat trial sets this many times
 block(1).instruction = ['Press left or right button \n' ...
     'according to what direction of movement \n you are seeing\nor is dominant.\nPress key to start']; % replace with text you want
 % button-press report catch trial block
 block(2).reportmode = 'key'; % key/verbal/none
-block(2).trials = [3 13]; % which trialtypes in the block
+block(2).trials = [3 4 7 8 13 14 15 16]; % which trialtypes in the block
 block(2).randomizetrials = true; % randomize in block
 block(2).repeattrials = 1; % repeat trial sets this many times
 block(2).instruction = ['Press left or right button \n' ...
@@ -416,14 +416,14 @@ block(2).instruction = ['Press left or right button \n' ...
 
 % no report
 block(3).reportmode = 'none'; % key/verbal/none
-block(3).trials = [1 9]; % which trialtypes in the block
+block(3).trials = [1 2 5 6 9 10 11 12]; % which trialtypes in the block
 block(3).randomizetrials = true; % randomize in block
 block(3).repeattrials = 2; % repeat trial sets this many times
 block(3).instruction = ['Do not press buttons now. to\n' ...
     'Just attend the fixation dot\nin the middle.\n\nPress key to start']; % replace with text you want
 % no report catch trial block
 block(4).reportmode = 'none'; % key/verbal/none
-block(4).trials = [3 13]; % which trialtypes in the block
+block(4).trials = [3 4 7 8 13 14 15 16]; % which trialtypes in the block
 block(4).randomizetrials = true; % randomize in block
 block(4).repeattrials = 1; % repeat trial sets this many times
 block(4).instruction = ['Do not press buttons now. to\n' ...

@@ -18,7 +18,7 @@
 blockchunk{1} = [1 2]; % block numbers for button presses
 blockchunk{2} = [3 4]; % block numbers for no report
 
-blockrepeats = 1; % repeat 'sets' of blocks
+blockrepeats = 0; % repeat 'sets' of blocks
 
 blockorder = [];
 
