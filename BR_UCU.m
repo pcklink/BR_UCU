@@ -934,7 +934,8 @@ try
                 if trialtype(T).replay 
                     if ~StimStarted || NewEpoch
                         CurrEpochDur = trialtype(T).replay(1) + ...
-                            (trialtype(T).replay(2)-trialtype(T).replay(1))*rand(1);
+                            (trialtype(T).replayminmax(2)-...
+                            trialtype(T).replayminmax(1))*rand(1);
                         NewEpoch = false; NewEpochT = true;
                         if replaystim == 1
                             replaystim = 2;
