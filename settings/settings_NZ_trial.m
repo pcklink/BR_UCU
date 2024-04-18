@@ -88,6 +88,7 @@ prestim(1).transient.contrastincr = 0.6; % change in contrast for exogenous atte
 prestim(1).transient.stim = 1; % which stim gets the transient
 prestim(1).transient.duration = 0.150; % how long is the contrast change
 prestim(1).transient.timewindow = [-0.35 -0.15]; % when can it happen relative to end of prestim [max min]
+prestim(1).transient.postpause = 0.5; % don't wait for key
 prestim(1).instruct = ['Fix your gaze on the blue dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
 prestim(1).quest = 'Did the contrast change happen to the dots moving left or right?\n Use the left or right arrow key.'; % question text after the prestim (key-press left/right is logged)
 
@@ -105,6 +106,7 @@ prestim(2).transient.contrastincr = 0.6; % change in contrast for exogenous atte
 prestim(2).transient.stim = 2; % which stim gets the transient
 prestim(2).transient.duration = 0.150; % how long is the contrast change
 prestim(2).transient.timewindow = [-0.35 -0.15]; % when can it happen relative to end of prestim [max min]
+prestim(2).transient.postpause = 0.5; % don't wait for key
 prestim(2).instruct = ['Fix your gaze on the blue dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
 prestim(2).quest = 'Did the contrast change happen to the dots moving left or right?\n Use the left or right arrow key.'; % question text after the prestim (key-press left/right is logged)
 
