@@ -18,7 +18,7 @@ monitor.DebugMode = 'NoDebug';% Debug mode allows subscreen stim display
 % eyetracker ---
 eyetracker.do = true; % using an eyetracker or not
 eyetracker.type = 'Tobii Pro Fusion'; % which eyetracker
-eyetracker.calibrate = false; % calibration as part of experiment (alternative is to do it separately
+eyetracker.calibrate = true; % calibration as part of experiment (alternative is to do it separately
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; % path to the eyetracker toolbox
 
 % sound ---
@@ -89,7 +89,7 @@ stim(2).driftspeed = -1.5; % deg/s
 %% Experiment structure 
 
 % trials: simulated rivalry 1
-trialtype(1).stimsize = [3 3]; % which stimuli [left right]
+trialtype(1).stimsize = [2 2]; % which stimuli [left right]
 trialtype(1).prestim = 2; % whic prestim
 trialtype(1).eye(1).stim = 1; % stim for eye1
 trialtype(1).eye(2).stim = 2; % stim for eye2

@@ -78,7 +78,7 @@ fix.color = [0 0 1]; % [R G B]
 prestim(1).type = 'dots'; % stimulus type
 prestim(1).attentiontype = 'exogenous'; % exogenous/endogenous
 prestim(1).dotsize = 0.2; % deg (there may be GPU based limitations)
-prestim(1).dotdensity = 3; % dots/deg2
+prestim(1).dotdensity = 4; % dots/deg2
 prestim(1).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 prestim(1).contrast = 0.2; % contrast of the dots
 prestim(1).contrastbin = true; % if true all dots have either the min or max value of the contrast
@@ -88,7 +88,7 @@ prestim(1).transient.contrastincr = 0.6; % change in contrast for exogenous atte
 prestim(1).transient.stim = 1; % which stim gets the transient
 prestim(1).transient.duration = 0.150; % how long is the contrast change
 prestim(1).transient.timewindow = [-0.35 -0.15]; % when can it happen relative to end of prestim [max min]
-prestim(1).transient.postpause = 0.5; % don't wait for key
+prestim(1).transient.postpause = 2; % don't wait for key
 prestim(1).instruct = ['Fix your gaze on the blue dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
 prestim(1).quest = 'Did the contrast change happen to the dots moving left or right?\n Use the left or right arrow key.'; % question text after the prestim (key-press left/right is logged)
 
@@ -96,7 +96,7 @@ prestim(1).quest = 'Did the contrast change happen to the dots moving left or ri
 prestim(2).type = 'dots'; % stimulus type
 prestim(2).attentiontype = 'exogenous'; % exogenous/endogenous
 prestim(2).dotsize = 0.2; % deg (there may be GPU based limitations)
-prestim(2).dotdensity = 3; % dots/deg2
+prestim(2).dotdensity = 4; % dots/deg2
 prestim(2).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 prestim(2).contrast = 0.2; % contrast of the dots
 prestim(2).contrastbin = true; % if true all dots have either the min or max value of the contrast
@@ -106,7 +106,7 @@ prestim(2).transient.contrastincr = 0.6; % change in contrast for exogenous atte
 prestim(2).transient.stim = 2; % which stim gets the transient
 prestim(2).transient.duration = 0.150; % how long is the contrast change
 prestim(2).transient.timewindow = [-0.35 -0.15]; % when can it happen relative to end of prestim [max min]
-prestim(2).transient.postpause = 0.5; % don't wait for key
+prestim(2).transient.postpause = 2; % don't wait for key
 prestim(2).instruct = ['Fix your gaze on the blue dot in the middle.']; % show an instruction before the trial starts (nothing if empty)
 prestim(2).quest = 'Did the contrast change happen to the dots moving left or right?\n Use the left or right arrow key.'; % question text after the prestim (key-press left/right is logged)
 
@@ -115,12 +115,12 @@ prestim(2).quest = 'Did the contrast change happen to the dots moving left or ri
 prestim(3).type = 'dots';  % stimulus type
 prestim(3).attentiontype = 'endogenous'; % exogenous/endogenous
 prestim(3).dotsize = 0.2; % deg (there may be GPU based limitations)
-prestim(3).dotdensity = 3; % dots/deg2
+prestim(3).dotdensity = 4; % dots/deg2
 prestim(3).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 prestim(3).contrast = 0.8; % contrast 0-1
 prestim(3).contrastbin = true; % if true all dots have either the min or max value of the contrast
 prestim(3).color = [1 0 0;0 1 0]; % leave empty for luminance contrast [R1 G1 B1; R2 G2 B2]
-prestim(3).orientations = [-135 -135; -45 -45]; % drift angle degrees clockwise [start_stim1 end_stim1; start_stim2 end_stim2]
+prestim(3).orientations = [-45 -45; -45 -45]; % drift angle degrees clockwise [start_stim1 end_stim1; start_stim2 end_stim2]
 % orientations is not used for dots
 prestim(3).driftspeed = [-1.5 0; 1.5 0]; % deg/s positive is rightward/down [H1 V1;H2 V2]
 prestim(3).trackstim = 1; % which stimulus should be tracked
@@ -137,16 +137,16 @@ prestim(3).durations = [1 4 1]; %[static rotating static]
 prestim(4).type = 'dots';  % stimulus type
 prestim(4).attentiontype = 'endogenous'; % exogenous/endogenous
 prestim(4).dotsize = 0.2; % deg (there may be GPU based limitations)
-prestim(4).dotdensity = 3; % dots/deg2
+prestim(4).dotdensity = 4; % dots/deg2
 prestim(4).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 prestim(4).contrast = 1; % contrast 0-1
 prestim(4).contrastbin = true; % if true all dots have either the min or max value of the contrast
 prestim(4).color = [1 0 0;0 1 0]; % leave empty for luminance contrast [R1 G1 B1; R2 G2 B2]
-prestim(4).orientations = [-135 -135; -45 -45]; % drift angle degrees clockwise [start_stim1 end_stim1; start_stim2 end_stim2]
+prestim(4).orientations = [-45 -45; -45 -45]; % drift angle degrees clockwise [start_stim1 end_stim1; start_stim2 end_stim2]
 % orientations is not used for dots
 prestim(4).driftspeed = [-1.5 0; 1.5 0]; % deg/s positive is rightward/down [H1 V1;H2 V2]
 prestim(4).trackstim = 2; % which stimulus should be tracked
-prestim(4).change.degpersec = 0.8; % deg/sec (choose integer frame counts
+prestim(4).change.degpersec = 1; % deg/sec (choose integer frame counts
 prestim(4).change.interval = [0.5 1.5]; % how long can a period of same direction change last [min max]
 prestim(4).change.prob = 0.05; % probability of direction change
 prestim(4).instruct = 'Attend dots moving RIGHT, while fixing your gaze on the blue dot in the middle.\nPress key to start.'; % question text after the prestim (ke-press left/right is logged)
@@ -159,7 +159,7 @@ prestim(4).durations = [1 4 1]; %[static rotating static]
 %% stimulus --
 stim(1).type = 'dots'; % stimulus type
 stim(1).dotsize = 0.2; % deg
-stim(1).dotdensity = 3; % dots/deg2
+stim(1).dotdensity = 4; % dots/deg2
 stim(1).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 stim(1).contrast = 1;  % contrast 0-1
 stim(1).contrastbin = true; % if true, only use highest and lowest
@@ -168,7 +168,7 @@ stim(1).driftspeed = [1.5 0]; % [h v] deg/s positive is rightward/down
 
 stim(2).type = 'dots'; % stimulus type
 stim(2).dotsize = 0.2; % deg
-stim(2).dotdensity = 3; % dots/deg2
+stim(2).dotdensity = 4; % dots/deg2
 stim(2).dotlifetime = 10; % dot life in # frames ([] is unlimited)
 stim(2).contrast = 1;  % contrast 0-1
 stim(2).contrastbin = true; % if true, only use highest and lowest
@@ -411,15 +411,15 @@ trialtype(16).time.ITIT  = 0.5; %s intertrial interval
 % blocks --
 % button-press report
 block(1).reportmode = 'key'; % key/verbal/none
-block(1).trials = [9]; % which trialtypes in the block
+block(1).trials = [1 9]; % which trialtypes in the block
 block(1).randomizetrials = true; % randomize in block
-block(1).repeattrials = 0; % repeat trial sets this many times
+block(1).repeattrials = 1; % repeat trial sets this many times
 block(1).instruction = ['Press left or right button \n' ...
     'according to what direction of movement \n you are seeing as dominant\nwhile fixating your gaze at' ...
     ' the blue dot in the middle\nPress key to start'];
 % button-press report catch trial block
 block(2).reportmode = 'key'; % key/verbal/none
-block(2).trials = [13]; % which trialtypes in the block
+block(2).trials = [3 13]; % which trialtypes in the block
 block(2).randomizetrials = true; % randomize in block
 block(2).repeattrials = 1; % repeat trial sets this many times
 block(2).instruction = ['Press left or right button \n' ...
@@ -430,7 +430,7 @@ block(2).instruction = ['Press left or right button \n' ...
 block(3).reportmode = 'none'; % key/verbal/none
 block(3).trials = [1 9]; % which trialtypes in the block
 block(3).randomizetrials = true; % randomize in block
-block(3).repeattrials = 2; % repeat trial sets this many times
+block(3).repeattrials = 1; % repeat trial sets this many times
 block(3).instruction = ['Do not press buttons now. to\n' ...
     'Just fixate your gaze on the blue dot\nin the middle.\n\nPress key to start']; % replace with text you want
 % no report catch trial block
@@ -442,7 +442,7 @@ block(4).instruction = ['Do not press buttons now. to\n' ...
     'Just fixate your gaze at the blue dot\nin the middle.\n\nPress key to start'];  % replace with text you want
 
 % expt --
-expt.blockorder = [1 2]; % set for a specific order, empty means 1:end
+expt.blockorder = []; % set for a specific order, empty means 1:end
 expt.randomizeblocks = false; % overrules order
 expt.blockrepeats = 1; % randomization only within set of repeats
 expt.thanktext = 'That was it\nThank you!';
