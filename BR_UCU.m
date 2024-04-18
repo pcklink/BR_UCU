@@ -71,7 +71,7 @@ try
 
     % Do some basic initializing
     PsychDefaultSetup(2); HideCursor;
-    ListenChar(2); % silence keyboard for matlab
+    % ListenChar(2); % silence keyboard for matlab
 
     % Get screen info --
     scr = Screen('screens'); % get screen info

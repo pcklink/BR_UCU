@@ -76,20 +76,20 @@ fix.color = [1 0 0]; % [R G B]
 stim(1).type = 'grating'; % stimulus type
 stim(1).sf = 2; % spatial frequency in cycles/deg
 stim(1).contrast = 1; % contrast 0-1
-stim(1).orient = 45; % degrees clockwise
+stim(1).orient = 60; % degrees clockwise
 stim(1).driftspeed = 1.5; % deg/s 
 
 stim(2).type = 'grating'; % stimulus type
 stim(2).sf = 2; % spatial frequency in cycles/deg
 stim(2).contrast = 1; % contrast 0-1
-stim(2).orient = -45; % degrees clockwise
+stim(2).orient = -60; % degrees clockwise
 stim(2).driftspeed = -1.5; % deg/s 
 
 % -------------------------------
 %% Experiment structure 
 
 % trials: simulated rivalry 1
-trialtype(1).stimsize = [4 4]; % wchich stimuli [left right]
+trialtype(1).stimsize = [3 3]; % which stimuli [left right]
 trialtype(1).prestim = 2; % whic prestim
 trialtype(1).eye(1).stim = 1; % stim for eye1
 trialtype(1).eye(2).stim = 2; % stim for eye2
@@ -98,38 +98,33 @@ trialtype(1).eye(2).stim = 2; % stim for eye2
 trialtype(1).time.FixT = 0; %s time without stimus / with alignment
 trialtype(1).time.PrestimT = []; %s leave empty or set zero for none
 trialtype(1).time.PrestimGapT = 0; %s between prestim and stim
-trialtype(1).time.StimT = 5; %s stimulus duration
+trialtype(1).time.StimT = 30; %s stimulus duration
 trialtype(1).time.ITIT  = 0; %s intertrial interval
 trialtype(1).replay = true; % replay trial?
-trialtype(1).replayminmax = [3 6]; % min/max epoch duration
+trialtype(1).replayminmax = [1 4]; % min/max epoch duration
 trialtype(1).poststimquest = []; % question text after the prestim (ke-press left/right is logged)
 % leave empty for none
 
-% trials: simulated rivalry 2 
+% trials: real rivalry  
 trialtype(2) = trialtype(1); % inititate copy, then change necessary things
 trialtype(2).prestim = 2; % whic prestim
-trialtype(2).eye(1).stim = 2; % stim for eye1
-trialtype(2).eye(2).stim = 1; % stim for eye2
-
-% trials: real rivalry  
-trialtype(3) = trialtype(1); % inititate copy, then change necessary things
-trialtype(3).prestim = 2; % whic prestim
-trialtype(3).eye(1).stim = 1; % stim for eye1
-trialtype(3).eye(2).stim = 2; % stim for eye2
+trialtype(2).eye(1).stim = 1; % stim for eye1
+trialtype(2).eye(2).stim = 2; % stim for eye2
 % Choose timing consistent with 60Hz refresh rate
 % so multiples of 1/60 s
-trialtype(3).time.FixT = 0; %s time without stimus / with alignment
-trialtype(3).time.PrestimT = []; %s leave empty or set zero for none
-trialtype(3).time.PrestimGapT = 0; %s between prestim and stim
-trialtype(3).time.StimT = 120; %s stimulus duration
-trialtype(3).time.ITIT  = 0; %s intertrial interval
-trialtype(3).replay = false; % replay trial?
-trialtype(3).replayminmax = [3 6]; % min/max epoch duration
+trialtype(2).time.FixT = 0; %s time without stimus / with alignment
+trialtype(2).time.PrestimT = []; %s leave empty or set zero for none
+trialtype(2).time.PrestimGapT = 0; %s between prestim and stim
+trialtype(2).time.StimT = 120; %s stimulus duration
+trialtype(2).time.ITIT  = 0; %s intertrial interval
+trialtype(2).replay = false; % replay trial?
+trialtype(2).replayminmax = [1 4]; % min/max epoch duration
 
 %% 
 % block: key report 
 block(1).reportmode = 'key'; % key/verbal/none
-block(1).trials = [1 2 1 2 1 2 3 3 2 1 2 1 2 1 1 2 1 2 1 2 3 3 2 1 2 1 2 1]; % which trialtypes in the block
+block(1).trials = [1, 2]; % which trialtypes in the block
+% block(1).trials = [1, 2, 2, 1, 1, 2, 2, 1]; % which trialtypes in the block
 block(1).randomizetrials = false; % randomize in block
 block(1).repeattrials = 1; % repeat trial sets this many times
 block(1).instruction = ['Click left/right to report\n' ...
@@ -139,7 +134,7 @@ block(1).instruction = ['Click left/right to report\n' ...
 
 % block: verbal report 
 block(2).reportmode = 'verbal'; % key/verbal/none
-block(2).trials = [1 2 1 2 1 2 3 3 2 1 2 1 2 1 1 2 1 2 1 2 3 3 2 1 2 1 2 1]; % which trialtypes in the block
+block(2).trials = [1, 2, 2, 1, 1, 2, 2, 1]; % which trialtypes in the block
 block(2).randomizetrials = false; % randomize in block
 block(2).repeattrials = 1; % repeat trial sets this many times
 block(2).instruction = ['Say "left"/"right" to report\n' ...
@@ -149,7 +144,7 @@ block(2).instruction = ['Say "left"/"right" to report\n' ...
 
 % block: no report 
 block(3).reportmode = 'none'; % key/verbal/none
-block(3).trials = [1 2 1 2 1 2 3 3 2 1 2 1 2 1 1 2 1 2 1 2 3 3 2 1 2 1 2 1]; % which trialtypes in the block
+block(3).trials = [1, 2, 2, 1, 1, 2, 2, 1]; % which trialtypes in the block
 block(3).randomizetrials = false; % randomize in block
 block(3).repeattrials = 1; % repeat trial sets this many times
 block(3).instruction = ['You do not have to report anything. \n' ...
@@ -158,7 +153,7 @@ block(3).instruction = ['You do not have to report anything. \n' ...
 %%
 
 % expt --
-expt.blockorder = [1 2 3]; % set for a specific order, empty means 1:end
+expt.blockorder = [1]; % set for a specific order, empty means 1:end
 expt.randomizeblocks = false; % overrules order
 expt.blockrepeats = 1; % randomization only within set of repeats
 expt.thanktext = 'That was it.\nThank you for participating!';
