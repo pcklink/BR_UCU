@@ -257,6 +257,7 @@ block(1).reportmode = 'key'; % key/verbal/none
 block(1).trials = [1 2 5 6 7 8]; % which trialtypes in the block
 block(1).randomizetrials = true; % randomize in block
 block(1).repeattrials = 2; % repeat trial sets this many times
+block(1).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(1).instruction = ['Press left or right button \n' ...
     'according to what direction of movement \n you are seeing\nor is dominant.\nPress key to start']; % replace with text you want
 % button-press report catch trial block
@@ -264,6 +265,7 @@ block(2).reportmode = 'key'; % key/verbal/none
 block(2).trials = [3 4 9 10 11 12]; % which trialtypes in the block
 block(2).randomizetrials = true; % randomize in block
 block(2).repeattrials = 1; % repeat trial sets this many times
+block(2).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(2).instruction = ['Press left or right button \n' ...
     'according to what direction of movement \nis more dominant.\n\nPress key to start']; % replace with text you want
 
@@ -272,6 +274,7 @@ block(3).reportmode = 'none'; % key/verbal/none
 block(3).trials = [1 2 5 6 7 8]; % which trialtypes in the block
 block(3).randomizetrials = true; % randomize in block
 block(3).repeattrials = 2; % repeat trial sets this many times
+block(3).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(3).instruction = ['Do not press buttons now. to\n' ...
     'Just attend the fixation dot\nin the middle.\n\nPress key to start']; % replace with text you want
 % no report catch trial block
@@ -279,6 +282,7 @@ block(4).reportmode = 'none'; % key/verbal/none
 block(4).trials = [3 4 9 10 11 12]; % which trialtypes in the block
 block(4).randomizetrials = true; % randomize in block
 block(4).repeattrials = 1; % repeat trial sets this many times
+block(4).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(4).instruction = ['Do not press buttons now. to\n' ...
     'Just attend the fixation dot\nin the middle.\n\nPress key to start'];  % replace with text you want
 

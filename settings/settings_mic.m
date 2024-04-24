@@ -231,6 +231,7 @@ block(1).reportmode = 'key'; % key/verbal/none
 block(1).trials = 1; % which trialtypes in the block
 block(1).randomizetrials = false; % randomize in block
 block(1).repeattrials = 3; % repeat trial sets this many times
+block(1).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(1).instruction = ['Some text to\n' ...
     'tell people what\n to do.\n\nPress key to start']; % replace with text you want
 

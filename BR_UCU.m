@@ -411,12 +411,33 @@ try
         B = expt.blocks(b);
         TRIALS = []; TL = block(B).trials;
         % create a list of trials for the current block
-        for rt = 1:block(B).repeattrials
-            if block(B).randomizetrials
-                TRIALS = [TRIALS TL(randperm(length(TL)))];
-            else
-                TRIALS = [TRIALS TL];
-            end
+        if ~isfield(block,'randrepmode')
+            block(B).randrepmode = 'randomrepeat';
+        end
+        switch block(B).randrepmode
+            case 'randomrepeat'
+                for rt = 1:block(B).repeattrials
+                    if block(B).randomizetrials
+                        TRIALS = [TRIALS TL(randperm(length(TL)))];
+                    else
+                        TRIALS = [TRIALS TL];
+                    end
+                end
+            case 'repeatrandom'
+                for rt = 1:block(B).repeattrials
+                    TRIALS = [TRIALS TL];
+                    if block(B).randomizetrials
+                        TRIALS = TRIALS(randperm(length(TRIALS)));
+                    end
+                end
+            otherwise
+               for rt = 1:block(B).repeattrials
+                    if block(B).randomizetrials
+                        TRIALS = [TRIALS TL(randperm(length(TL)))];
+                    else
+                        TRIALS = [TRIALS TL];
+                    end
+                end 
         end
 
         %% instruction screen -

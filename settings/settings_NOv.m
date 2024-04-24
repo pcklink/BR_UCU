@@ -127,6 +127,7 @@ block(1).trials = [1, 2]; % which trialtypes in the block
 % block(1).trials = [1, 2, 2, 1, 1, 2, 2, 1]; % which trialtypes in the block
 block(1).randomizetrials = false; % randomize in block
 block(1).repeattrials = 1; % repeat trial sets this many times
+block(1).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(1).instruction = ['Click left/right to report\n' ...
     'in which direction\n the lines are moving.\n\nPress key to start']; % replace with text you want
     
@@ -137,6 +138,7 @@ block(2).reportmode = 'verbal'; % key/verbal/none
 block(2).trials = [1, 2, 2, 1, 1, 2, 2, 1]; % which trialtypes in the block
 block(2).randomizetrials = false; % randomize in block
 block(2).repeattrials = 1; % repeat trial sets this many times
+block(2).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(2).instruction = ['Say "left"/"right" to report\n' ...
     'in which direction\n the lines are moving.\n\nPress key to start']; % replace with text you want
 
@@ -147,6 +149,7 @@ block(3).reportmode = 'none'; % key/verbal/none
 block(3).trials = [1, 2, 2, 1, 1, 2, 2, 1]; % which trialtypes in the block
 block(3).randomizetrials = false; % randomize in block
 block(3).repeattrials = 1; % repeat trial sets this many times
+block(3).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(3).instruction = ['You do not have to report anything. \n' ...
     'Just pay attention. \n\nPress key to start']; % replace with text you want
 

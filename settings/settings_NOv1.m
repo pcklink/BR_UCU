@@ -193,6 +193,7 @@ block(1).reportmode = 'key'; % key/verbal/none
 block(1).trials = 1; % which trialtypes in the block
 block(1).randomizetrials = false; % randomize in block
 block(1).repeattrials = 1; % repeat trial sets this many times
+block(1).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(1).instruction = ['Press key\n' ...
     'tell people what\n to do.\n\nPress key to start']; % replace with text you want
 
@@ -201,6 +202,7 @@ block(2).reportmode = 'verbal'; % key/verbal/none
 block(2).trials = 1; % which trialtypes in the block
 block(2).randomizetrials = false; % randomize in block
 block(2).repeattrials = 1; % repeat trial sets this many times
+block(2).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(2).instruction = ['Some text to\n' ...
     'tell people what\n to do.\n\nPress key to start']; % replace with text you want
 
@@ -209,6 +211,7 @@ block(3).reportmode = 'none'; % key/verbal/none
 block(3).trials = 1; % which trialtypes in the block
 block(3).randomizetrials = false; % randomize in block
 block(3).repeattrials = 1; % repeat trial sets this many times
+block(3).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(3).instruction = ['Some text to\n' ...
     'tell people what\n to do.\n\nPress key to start']; % replace with text you want
 

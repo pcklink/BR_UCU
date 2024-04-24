@@ -414,6 +414,7 @@ block(1).reportmode = 'key'; % key/verbal/none
 block(1).trials = [1 9]; % which trialtypes in the block
 block(1).randomizetrials = true; % randomize in block
 block(1).repeattrials = 1; % repeat trial sets this many times
+block(1).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(1).instruction = ['Press left or right button \n' ...
     'according to what direction of movement \n you are seeing as dominant\nwhile fixating your gaze at' ...
     ' the blue dot in the middle\nPress key to start'];
@@ -422,6 +423,7 @@ block(2).reportmode = 'key'; % key/verbal/none
 block(2).trials = [3 13]; % which trialtypes in the block
 block(2).randomizetrials = true; % randomize in block
 block(2).repeattrials = 1; % repeat trial sets this many times
+block(2).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(2).instruction = ['Press left or right button \n' ...
     'according to what direction of movement \n you are seeing as dominant\nwhile fixating your gaze at' ...
     ' the blue dot in the middle\nPress key to start'];
@@ -431,6 +433,7 @@ block(3).reportmode = 'none'; % key/verbal/none
 block(3).trials = [1 9]; % which trialtypes in the block
 block(3).randomizetrials = true; % randomize in block
 block(3).repeattrials = 1; % repeat trial sets this many times
+block(3).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(3).instruction = ['Do not press buttons now. to\n' ...
     'Just fixate your gaze on the blue dot\nin the middle.\n\nPress key to start']; % replace with text you want
 % no report catch trial block
@@ -438,6 +441,7 @@ block(4).reportmode = 'none'; % key/verbal/none
 block(4).trials = [3 13]; % which trialtypes in the block
 block(4).randomizetrials = true; % randomize in block
 block(4).repeattrials = 1; % repeat trial sets this many times
+block(4).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(4).instruction = ['Do not press buttons now. to\n' ...
     'Just fixate your gaze at the blue dot\nin the middle.\n\nPress key to start'];  % replace with text you want
 
