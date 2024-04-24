@@ -563,6 +563,7 @@ try
                 end
                 Screen('DrawingFinished',monitor.w);
                 vbl = Screen('Flip', monitor.w);
+
                 % wait for key
                 [secs, ~, ~] = KbWait();
 
@@ -893,6 +894,10 @@ try
                                 break;
                             end
                         end
+                    end
+                    % wait for key to be released 
+                    while KeyIsDown
+                        [KeyIsDown,~,~] = KbCheck;
                     end
                 else
                     % wait for a bit
