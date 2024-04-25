@@ -1,7 +1,9 @@
 % load data
 cd pilot-data
+cd NO
 load('eyedata_20240423_1845');
 load('logfile.mat');
+cd ..
 cd ..
 
 % re-reference the time of events
