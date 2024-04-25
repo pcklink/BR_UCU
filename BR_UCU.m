@@ -1316,6 +1316,10 @@ try
                         end
                     end
                 end
+                % wait for key to be released
+                while KeyIsDown
+                    [KeyIsDown,~,~] = KbCheck;
+                end
             end
 
             % stop audio capture
