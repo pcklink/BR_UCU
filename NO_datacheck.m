@@ -105,7 +105,7 @@ for b=1:nb
                 seleye = (eyeT2>trial0 & eyeT2<trial1);
                                 
                 subplot(d-1,d,ti); hold on;
-                plot(vt, 3+nv(1:length(vt))); % plot voice
+                plot(vt, nv(1:length(vt))); % plot voice
                 plot(eyeT2(seleye)-trial0, eyeX(seleye),'g'); % plot eye
                 set(gca,'ylim',[-1 3]);
 
