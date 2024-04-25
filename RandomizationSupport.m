@@ -15,14 +15,16 @@
 % across chunks
 
 % assuming the above listed numbering for block types
-blockchunk{1} = [1 2]; % block numbers for button presses
-blockchunk{2} = [3 4]; % block numbers for no report
+blockchunk{1} = [1 2]; % button press, exo
+blockchunk{2} = [3 4];% button press, endo
+blockchunk{3} = [5 6]; % no report, exo
+blockchunk{4} = [7 8];% no report, endo 
 
-blockrepeats = 0; % repeat 'sets' of blocks
+blockrepeats = 1; % repeat 'sets' of blocks
 
 blockorder = [];
 
-randomchunkorder = true;
+randomchunkorder = false;
 randomblocksinchunk = true;
 
 for i = 1:blockrepeats

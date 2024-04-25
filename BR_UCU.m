@@ -1289,7 +1289,7 @@ try
             StimStarted = true;
 
             % Do a response moment if requested
-            if ~isempty(trialtype(T).poststimquest)
+            if ~isempty(trialtype(T).poststimquest) && strcmp(block(B).reportmode, 'key')
                 for fb = [0 1] % both framebuffers for stereomode
                     % BG
                     DrawBackground(monitor, fb, bg);
