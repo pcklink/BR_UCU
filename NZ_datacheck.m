@@ -51,7 +51,7 @@ eyeTd = data.gaze.systemTimeStamp;
 bs1 = blockstarts(1);
 bs1e = messages{find(strcmp(messages(:,2),'BlockStart'),1,'first'),1};
 bs1ei = find(eyeTd <= bs1e,1,"last");
-dt = eyeT(bs1ei) - bs1;
+tt(end) = eyeT(bs1ei) - bs1;
 eyeT2 = eyeT -dt;
 
 %% plot the timeline
@@ -69,18 +69,21 @@ for b=1:2%nb
         thisblock1 = tt(end);
     end
 
-    fti = find(trialstarts>thisblock0 .* trialstarts<thisblock1);
-    fpsi = find(psstarts>thisblock0 .* psstarts<thisblock1);
-    psli = find(ps_keyleft>thisblock0 .* ps_keyleft<thisblock1);
-    psri = find(ps_keyright>thisblock0 .* ps_keyright<thisblock1);
-    sli = find(s_keyleft>thisblock0 .* s_keyleft<thisblock1);
-    sri = find(s_keyright>thisblock0 .* s_keyright<thisblock1);
+    fti = find(trialstarts>thisblock0 & trialstarts<thisblock1);
+    fpsi = find(psstarts>thisblock0 & psstarts<thisblock1);
+    psli = find(ps_keyleft>thisblock0 & ps_keyleft<thisblock1);
+    psri = find(ps_keyright>thisblock0 & ps_keyright<thisblock1);
+    sli = find(s_keyleft>thisblock0 & s_keyleft<thisblock1);
+    sri = find(s_keyright>thisblock0 & s_keyright<thisblock1);
     
     seleye = (eyeT2>thisblock0 & eyeT2<thisblock1);
 
+    plot(blockstarts, ones(size(blockstarts)).*-1,'dc');    
+    hold on
+
+
     %plot eye
     plot(eyeT2(seleye), eyeX(seleye),'g');
-
     % plot prestim stuff
     plot(psstarts(fpsi)-thisblock0, ones(1,length(fpsi)),'sw')
     plot(ps_keyleft(psli)-thisblock0, ones(1,length(psli)),'or')
