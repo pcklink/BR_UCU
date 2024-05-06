@@ -1,7 +1,7 @@
 % load data
-cd pilot-data
-cd NO
-load('eyedata_20240423_1845');
+% cd log
+% cd NO_part3
+load('eyedata_20240501_1628');
 load('logfile.mat');
 cd ..
 cd ..
@@ -38,7 +38,7 @@ kri = find(strcmp(log.ev.type,'KeyPress').*strcmp(log.ev.info,'RightArrow'));
 keyright = tt(kri);
 
 % get eyetrace info on a per-trial basis
-eyeX = data.gaze.left.gazePoint.inUserCoords(1,:)./settings.monitor.Deg2Pix;
+eyeX = data.gaze.right.gazePoint.inUserCoords(1,:)./settings.monitor.Deg2Pix;
 eyeT = 0:1/60:(length(eyeX)-1)/60;
 eyeTd = data.gaze.systemTimeStamp;
 % rereference time

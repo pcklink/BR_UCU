@@ -1,7 +1,7 @@
 %% load data
-cd pilot-data
-cd NZ
-load('eyedata_20240425_1402');
+%cd pilot-data
+%cd NZ
+load('eyedata_20240506_1327');
 load('logfile.mat');
 cd ..
 cd ..
