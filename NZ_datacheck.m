@@ -52,6 +52,7 @@ bs1 = blockstarts(1);
 bs1e = messages{find(strcmp(messages(:,2),'BlockStart'),1,'first'),1};
 bs1ei = find(eyeTd <= bs1e,1,"last");
 tt(end) = eyeT(bs1ei) - bs1;
+dt = eyeT(bs1ei) - bs1;
 eyeT2 = eyeT -dt;
 
 %% plot the timeline
