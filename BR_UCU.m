@@ -885,7 +885,7 @@ try
                         [KeyIsDown,keys.secs,keys.keyCode] = KbCheck;
                         if KeyIsDown
                             keys.LastKey = KbName(find(keys.keyCode)); % Get the name of the pressed key
-                            if strcmp(keys.LastKey,keys.resp{1}) || strcmp(keys.LastKey,keys.resp{2})
+                            if any(strcmp(keys.LastKey,keys.resp)) 
                                 log.ev = [log.ev; {keys.secs,'PreStimResponse',keys.LastKey}];
                                 RespLogged = true;
                             elseif strcmp(keys.LastKey,keys.esc)
@@ -1306,7 +1306,7 @@ try
                     [KeyIsDown,keys.secs,keys.keyCode] = KbCheck;
                     if KeyIsDown
                         keys.LastKey = KbName(find(keys.keyCode)); % Get the name of the pressed key
-                        if strcmp(keys.LastKey,keys.resp{1}) || strcmp(keys.LastKey,keys.resp{2})
+                        if any(strcmp(keys.LastKey,keys.resp))
                             log.ev = [log.ev; {keys.secs,'PostStimResponse',keys.LastKey}];
                             RespLogged = true;
                         elseif strcmp(keys.LastKey,keys.esc)
