@@ -23,7 +23,7 @@ vNames = {'SesID','SesFld','Subject','Age','Gender','Handedness',...
     'Block','Report','TrialNum','TrialType','PreStim','StimL', 'StimR',...
     'Attention','PrestimResponse','PreStimEnd','PreStimTransient',...
     'StimResponse','Eye_slope','Eye_pval',...
-    'Eye_meandiff','Eye_sumdiff','Eye_stddiff','mVel'};
+    'Eye_meandiff','Eye_sumdiff','Eye_stddiff','mVel500','mVel1000'};
 row=1;
 for d = 1:length(D)  % datasets
     fprintf(['Data session ' num2str(d) '\n']);
@@ -143,7 +143,8 @@ for d = 1:length(D)  % datasets
             EYEX = eyeX(ei1:ei2);
             % linear regression
             timeeye = eyeT2(ei1:ei2);
-            incidx = ~isnan(EYEX) & (timeeye>=si_now) & (timeeye<=si_now+1);
+            incidx = ~isnan(EYEX) & ...
+                (timeeye>=si_now+0.2) & (timeeye<=si_now+1.2);
                         
             warning off
             lm = fitlm(timeeye(incidx),EYEX(incidx));
@@ -168,37 +169,51 @@ for d = 1:length(D)  % datasets
             subplot(2,1,1); hold off;
             plot(t,x,'o-'); hold on;
             plot([t(1) t(end)],[0 0],'w');
+            if exist('malowess','file') == 2
+                xlowess = malowess(t,x,Span=0.2);
+                v = (diff(xlowess))*60; % velocity in deg/s
+                sw = round(60/10); % smoothing window 100 ms
+                plot(t,xlowess,'r-','LineWidth',2)
+            end
+
             plot([si_now si_now],[-1,1]*max(abs(x)),'y');
-            plot([si_now+1 si_now+1],[-1,1]*max(abs(x)),'y--');
+            plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(x)),'y--');
+            plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(x)),'y--');
+            plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(x)),'y--');
             plot(timeeye(incidx),lm.Coefficients.Estimate("x1")*timeeye(incidx) + ...
-                lm.Coefficients.Estimate("(Intercept)"));
+                lm.Coefficients.Estimate("(Intercept)"),'g-');
             yr = max(abs(x(t>si_now & t<si_now+1)));
             if ~isnan(yr) && yr
                 set(gca,'xlim',[si_now-0.5 si_now+1.5],'ylim',[-1,1]*yr);
             else
                 set(gca,'xlim',[si_now-0.5 si_now+1.5]);
             end
-            title('X position')
+            title('X position with LOWESS smoothing @100ms')
 
             subplot(2,1,2); hold off;
             yrr = smooth(v,sw);
             yr = max(abs(yrr(t>si_now & t<si_now+1)));
-            plot(t(2:end),smooth(v,sw),'o-'); hold on;
-            plot([t(1) t(end)],[0 0],'w');
+            plot([t(1) t(end)],[0 0],'w'); hold on;
+            plot(t(2:end),smooth(v,sw),'r-','LineWidth',2); 
             plot([si_now si_now],[-1,1]*max(abs(smooth(v,sw))),'y');
-            plot([si_now+1 si_now+1],[-1,1]*max(abs(smooth(v,sw))),'y--');
+            plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(smooth(v,sw))),'y--');
+            plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(smooth(v,sw))),'y--');
+            plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(smooth(v,sw))),'y--');
             if ~isnan(yr) && yr
-                set(gca,'xlim',[si_now-0.5 si_now+1.5],'ylim',[-1,1]*yr);
+                set(gca,'xlim',[si_now-0.5 si_now+1.5],...
+                    'ylim',[-1,1]*max(abs(smooth(v,sw))));
             else
                 set(gca,'xlim',[si_now-0.5 si_now+1.5]);
             end
-            title('Horizontal velocity (smoothed')
-
             sgtitle(['Eyetrace --- ' SUBJECT ' B-' num2str(BlockNr) ...
                 ' T-' num2str(TrialNr)]);
 
-            idx = (t>=si_now) & (t<=si_now+1);
-            mVel = mean(smooth(v(idx),sw));
+            idx = (t>=si_now+0.2) & (t<=si_now+1.2);
+            mVel1000 = mean(smooth(v(idx),sw));
+            idx = (t>=si_now+0.2) & (t<=si_now+0.7);
+            mVel500 = mean(smooth(v(idx),sw));
+            title(sprintf(['Horizontal velocity\nmVel500 = ' num2str(mVel500) ...
+                ', mVel1000 = ' num2str(mVel1000)]));
             
             [~,~] = mkdir('NZ_eye');
             fn = ['eye_csvrow_'  sprintf('%03d', row) '.png'];
@@ -208,7 +223,7 @@ for d = 1:length(D)  % datasets
             newRow = {SessNr,SessFld,SUBJECT,str2double(AGE),GENDER,HANDEDNESS,...
                 BlockNr,BlockType,TrialNr,TrialType,PreStim,StimEye1,StimEye2,...
                 Attention,PrestimResponse,PreStimEnd,PreStimTransient,...
-                StimResponse,slope,pval,dEYE_MEAN,dEYE_SUM,dEYE_STD,mVel};
+                StimResponse,slope,pval,dEYE_MEAN,dEYE_SUM,dEYE_STD,mVel500,mVel1000};
             T = [T; newRow];
 
             row = row+1;
