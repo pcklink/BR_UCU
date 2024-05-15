@@ -170,7 +170,8 @@ for d = 1:length(D)  % datasets
             plot(t,x,'o-'); hold on;
             plot([t(1) t(end)],[0 0],'w');
             if exist('malowess','file') == 2
-                xlowess = malowess(t,x,Span=0.2);
+                xlowess = smooth(t,x,30,'loess');
+                %xlowess = malowess(t,x,Span=0.2);
                 v = (diff(xlowess))*60; % velocity in deg/s
                 sw = round(60/10); % smoothing window 100 ms
                 plot(t,xlowess,'r-','LineWidth',2)

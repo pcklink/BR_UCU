@@ -17,7 +17,7 @@ monitor.distance = 690; % mm distance to screen
 monitor.fliphorizontal = true; % mirror the video buffer to account for stereoscope mirrors
 monitor.stereomode = 4; % 4 = uncrossed screen halves / 5 = crossed screen halves [CHECK THIS!]
 monitor.maxpenwidth = 7; % Graphics card limitation, you can try ti increase, but may get errors
-monitor.DebugMode = 'NoDebug';% Debug mode allows subscreen stim display
+monitor.DebugMode = 'CKHOME';% Debug mode allows subscreen stim display
 % set this to 'NoDebug' when running the experiments
 % NoDebug / UU / CKHOME / CKNIN
 
@@ -211,9 +211,9 @@ stim(6).overlay.driftspeed = 1.5; % deg/s positive is rightward/down
 
 % trials --
 trialtype(1).stimsize = [4 4]; % wchich stimuli [left right]
-trialtype(1).prestim = 2; % whic prestim
-trialtype(1).eye(1).stim = 1; % stim for eye1
-trialtype(1).eye(2).stim = 2; % stim for eye2
+trialtype(1).prestim = []; % whic prestim
+trialtype(1).eye(1).stim = 5; % stim for eye1
+trialtype(1).eye(2).stim = 6; % stim for eye2
 % Choose timing consistent with 60Hz refresh rate
 % so multiples of 1/60 s
 trialtype(1).time.FixT = 1; %s time without stimus / with alignment

@@ -54,7 +54,7 @@ if eyetracker.do && eyetracker.calibrate % alternatively do this with a separate
     try
         SetMonitors('mirrored'); % set monitors in mirrored mode
         calibrateTobii(eyetracker, log); % run calibration
-        SetMonitors('extended') % set monitors in extended mode
+        SetMonitors('extended'); % set monitors in extended mode
     catch
         fprintf('ERROR doing eyetracker calibration\n'); % we'll go here if something goes wrong
     end
