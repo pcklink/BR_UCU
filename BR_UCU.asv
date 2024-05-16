@@ -496,7 +496,7 @@ try
                 dV = (mY- maskcenter(2)) / maskradius(2);
                 maskmat = (dH.^2 + dV.^2 <= 1);
             else
-                maskmat = ones(StimSizePix);
+                maskmat = ones(StimSizePix)
             end
 
             maskbg = ~isnan(maskmat);
