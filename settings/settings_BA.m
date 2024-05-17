@@ -4,10 +4,10 @@ monitor.distance = 690;
 monitor.fliphorizontal = true; 
 monitor.stereomode = 4; 
 monitor.maxpenwidth = 7; 
-monitor.DebugMode = 'NoDebug'; 
+monitor.DebugMode = 'CKHOME'; 
 
 % eyetracker ---
-eyetracker.do = true; 
+eyetracker.do = false; 
 eyetracker.type = 'Tobii Pro Fusion'; 
 eyetracker.calibrate = true; 
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; 
@@ -49,27 +49,27 @@ fix.color = [1 0 0];
 % stimuli
 
 stim(1).type = 'image';
-stim(1).image = 'happy_schematic.bmp';
+stim(1).image = 'happy_line.png';
 stim(1).overlay.type = 'lines';
 stim(1).overlay.linewidth = 0.1;
-stim(1).overlay.linedensity = 2;
+stim(1).overlay.linedensity = 3;
 stim(1).overlay.color = [0 0 0];
 stim(1).overlay.opacity = 0.7;
 stim(1).overlay.orientation = 'vertical';
-stim(1).overlay.driftspeed = 1.5;
+stim(1).overlay.driftspeed = 2;
 
 stim(2).type = 'image';
-stim(2).image = 'happy_schematic.bmp';
+stim(2).image = 'happy_line.png';
 stim(2).overlay.type = 'lines';
 stim(2).overlay.linewidth = 0.1;
-stim(2).overlay.linedensity = 2;
+stim(2).overlay.linedensity = 3;
 stim(2).overlay.color = [0 0 0];
 stim(2).overlay.opacity = 0.7;
 stim(2).overlay.orientation = 'vertical';
-stim(2).overlay.driftspeed = -1.5;
+stim(2).overlay.driftspeed = -2;
 
 stim(3).type = 'image';
-stim(3).image = 'sad_schematic.bmp';
+stim(3).image = 'sad_line.png';
 stim(3).overlay.type = 'lines';
 stim(3).overlay.linewidth = 0.1;
 stim(3).overlay.linedensity = 2;
@@ -79,7 +79,7 @@ stim(3).overlay.orientation = 'vertical';
 stim(3).overlay.driftspeed = 1.5;
 
 stim(4).type = 'image';
-stim(4).image = 'sad_schematic.bmp';
+stim(4).image = 'sad_line.png';
 stim(4).overlay.type = 'lines';
 stim(4).overlay.linewidth = 0.1;
 stim(4).overlay.linedensity = 2;
@@ -89,7 +89,7 @@ stim(4).overlay.orientation = 'vertical';
 stim(4).overlay.driftspeed = -1.5;
 
 stim(5).type = 'image';
-stim(5).image = 'neutral_schematic.bmp';
+stim(5).image = 'neutral_line.png';
 stim(5).overlay.type = 'lines';
 stim(5).overlay.linewidth = 0.1;
 stim(5).overlay.linedensity = 2;
@@ -99,7 +99,7 @@ stim(5).overlay.orientation = 'vertical';
 stim(5).overlay.driftspeed = 1.5;
 
 stim(6).type = 'image';
-stim(6).image = 'neutral_schematic.bmp';
+stim(6).image = 'neutral_line.png';
 stim(6).overlay.type = 'lines';
 stim(6).overlay.linewidth = 0.1;
 stim(6).overlay.linedensity = 2;
@@ -111,14 +111,14 @@ stim(6).overlay.driftspeed = -1.5;
 %% Experiment structure 
 
 % trials: simulated rivalry 1 -> What does this do?
-trialtype(1).stimsize = [2 2];
+trialtype(1).stimsize = [4 4];
 trialtype(1).prestim = []; %-> How do I delete this prestim
 trialtype(1).eye(1).stim = 1;
 trialtype(1).eye(2).stim = 2;
-trialtype(1).time.FixT = 0;
+trialtype(1).time.FixT = 0.5;
 trialtype(1).time.PrestimT = [];
 trialtype(1).time.PrestimGapT = 0;
-trialtype(1).time.StimT = 30;
+trialtype(1).time.StimT = 5;
 trialtype(1).time.ITIT  = 0;
 trialtype(1).replay = true;
 trialtype(1).replayminmax = [1 4];
@@ -249,8 +249,8 @@ block(3).instruction = ['You do not have to report anything. \n' ...
 %%
 
 % expt --
-expt.blockorder = [1];
+expt.blockorder = [];
 expt.randomizeblocks = false;
 expt.blockrepeats = 1;
 expt.thanktext = 'Thats it, all done.\nThank you so much for participating!';
-expt.thankdur = 5;
+expt.thankdur = .5;

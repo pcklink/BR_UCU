@@ -12,7 +12,7 @@
 %% Hardware ----
 % -------------------------------
 % monitor ---
-monitor.gamma = 2.2; % used for linearizaion of contrast, measured by CP [DO NOT CHANGE]
+monitor.gamma = 1;%2.2; % used for linearizaion of contrast, measured by CP [DO NOT CHANGE]
 monitor.distance = 690; % mm distance to screen
 monitor.fliphorizontal = true; % mirror the video buffer to account for stereoscope mirrors
 monitor.stereomode = 4; % 4 = uncrossed screen halves / 5 = crossed screen halves [CHECK THIS!]
@@ -61,7 +61,7 @@ log.fld = 'log'; % base log folder, a subfolder with YYYYMMDD_HHMM start time la
 bg.color = [0.5 0.5 0.5]; % [R G B] 0 = black, 1 = white
 bg.textcolor = [1 1 1]; % [R G B]
 % there is a fame and crosshair around the stimulus to help alignment
-bg.align.Frame.Type = 0; % 0 = oval, 1 = rectangle
+bg.align.Frame.Type = 1; % 0 = oval, 1 = rectangle
 bg.align.Frame.PenWidth = .2; % in deg
 bg.align.Frame.CrossLength = [6 6]; % in deg
 bg.align.Frame.Color = [0 0 0]; % [R G B] range: 0-1
@@ -193,27 +193,49 @@ stim(5).overlay.contrast = 1;  % contrast 0-1
 stim(5).overlay.contrastbin = true; % if true all dots have either the min or max value of the contrast
 stim(5).overlay.color = []; % [R G B] if empty, contrast is used
 stim(5).overlay.opacity = 0.5; % transparancy 0-1
-stim(5).overlay.driftspeed = [1.5 0]; % [h v] deg/s positive is rightward/down
+stim(5).overlay.driftspeed = [0 -2.5]; % [h v] deg/s positive is rightward/down
 
 stim(6).type = 'image'; % load a bitmap
-stim(6).image = 'image-02.bmp'; % should be in the images folder
+stim(6).image = 'sad_line.png'; % should be in the images folder
 stim(6).overlay.type = 'lines';  % overlay type of stimulus
 stim(6).overlay.linewidth = 0.1; % deg
 stim(6).overlay.linedensity = 2; % lines/deg
 stim(6).overlay.color = [0 0 0]; % [R G B] if empty, contrast is used
 stim(6).overlay.opacity = 0.5; % transparancy 0-1
 stim(6).overlay.orientation = 'vertical'; % horizontal/vertical
-stim(6).overlay.driftspeed = 1.5; % deg/s positive is rightward/down
+stim(6).overlay.driftspeed = -2; % deg/s positive is rightward/down
+
+stim(7).type = 'image'; % load a bitmap
+stim(7).image = 'happy_line.png'; % should be in the images folder
+stim(7).overlay.type = 'lines';  % overlay type of stimulus
+stim(7).overlay.linewidth = 0.1; % deg
+stim(7).overlay.linedensity = 4; % lines/deg
+stim(7).overlay.color = [0 0 0]; % [R G B] if empty, contrast is used
+stim(7).overlay.opacity = 0.5; % transparancy 0-1
+stim(7).overlay.orientation = 'horizontal'; % horizontal/vertical
+stim(7).overlay.driftspeed = -2; % deg/s positive is rightward/down
+
+stim(8).type = 'image'; % load a bitmap
+stim(8).image = 'image-02.bmp'; % should be in the images folder
+stim(8).overlay.type = 'dots'; % overlay type of stimulus
+stim(8).overlay.dotsize = 0.25; % deg
+stim(8).overlay.dotdensity = 5; % dots/deg2
+stim(8).overlay.dotlifetime = 10; % dot life in # frames ([] is unlimited)
+stim(8).overlay.contrast = 1;  % contrast 0-1
+stim(8).overlay.contrastbin = true; % if true all dots have either the min or max value of the contrast
+stim(8).overlay.color = []; % [R G B] if empty, contrast is used
+stim(8).overlay.opacity = 0.5; % transparancy 0-1
+stim(8).overlay.driftspeed = [5 0]; % [h v] deg/s positive is rightward/down
 
 % -------------------------------
 %% Experiment structure ----
 % -------------------------------
 
 % trials --
-trialtype(1).stimsize = [4 4]; % wchich stimuli [left right]
+trialtype(1).stimsize = [4 4]; 
 trialtype(1).prestim = []; % whic prestim
-trialtype(1).eye(1).stim = 5; % stim for eye1
-trialtype(1).eye(2).stim = 6; % stim for eye2
+trialtype(1).eye(1).stim = 6; % stim for eye1
+trialtype(1).eye(2).stim = 7; % stim for eye2
 % Choose timing consistent with 60Hz refresh rate
 % so multiples of 1/60 s
 trialtype(1).time.FixT = 1; %s time without stimus / with alignment
@@ -221,7 +243,7 @@ trialtype(1).time.PrestimT = []; %s leave empty or set zero for none
 trialtype(1).time.PrestimGapT = 1; %s between prestim and stim
 trialtype(1).time.StimT = 5; %s stimulus duration
 trialtype(1).time.ITIT  = 1; %s intertrial interval
-trialtype(1).replay = false; % replay trial?
+trialtype(1).replay = true; % replay trial?
 trialtype(1).replayminmax = [3 6]; % min/max epoch duration
 trialtype(1).poststimquest = []; % question text after the prestim (ke-press left/right is logged)
 % leave empty for none
@@ -240,4 +262,4 @@ expt.blockorder = []; % set for a specific order, empty means 1:end
 expt.randomizeblocks = true; % overrules order
 expt.blockrepeats = 1; % randomization only within set of repeats
 expt.thanktext = 'That was it\nThank you!';
-expt.thankdur = 2; % seconds
+expt.thankdur = .2; % seconds
