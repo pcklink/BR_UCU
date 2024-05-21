@@ -32,7 +32,7 @@ log.fld = 'log_BA';
 %% background --
 bg.color = [0.5 0.5 0.5]; 
 bg.textcolor = [1 1 1];
-bg.align.Frame.Type = 1;  % 0 for oval, 1 for rectangular
+bg.align.Frame.Type = 0;  % 0 for oval, 1 for rectangular
 bg.align.Frame.PenWidth = .2;
 bg.align.Frame.CrossLength = [6 6];
 bg.align.Frame.Color = [0 0 0]; 
@@ -221,21 +221,15 @@ trialtype(9).time.ITIT  = 0;
 trialtype(9).replay = false;
 trialtype(9).replayminmax = [1 4];
 
-% block: key report 
+% block: training
 block(1).reportmode = 'key';
-block(1).trials = [2,3,4,5,6,7,8,9]; 
+block(1).trials = [2,9]; 
 block(1).randomizetrials = true;
-block(1).repeattrials = 2;
+block(1).repeattrials = 1;
 block(1).instruction = ['Click the left key to report emotional faces\n' ...
-    'Click the center key to report neutral faces\n Click the right key to report if you are unsure.\n\nPress any key to start'];
+    'Click the center key to report neutral faces\n Click the right key to report if you are unsure.\n\nPress key to start'];
 
-% block: no report 
-block(2).reportmode = 'none'; 
-block(2).trials = [2,3,4,5,6,7,8,9]; 
-block(2).randomizetrials = true; %-> will this bring about a lot of extra work when doing data analysis 
-block(2).repeattrials = 2; 
-block(2).instruction = ['You do not have to report anything. \n' ...
-    'Just pay attention. \n\nPress any key to start']; 
+
 
 %%
 
