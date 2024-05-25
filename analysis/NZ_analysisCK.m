@@ -1,4 +1,4 @@
-%% Data processing 
+%% Data processing
 DataFld = '/Users/chris/Documents/TEACHING/UU/PF/UCU_thesis/2024/BR_UCU/log';
 AnalysisFld = '/Users/chris/Documents/TEACHING/UU/PF/UCU_thesis/2024/BR_UCU/analysis';
 cd(DataFld);
@@ -27,7 +27,7 @@ vNames = {'SesID','SesFld','Subject','Age','Gender','Handedness',...
 row=1;
 for d = 1:length(D)  % datasets
     fprintf(['Data session ' num2str(d) '\n']);
-    % - Demographic info (age, sex, left/right handed, participant ID) 
+    % - Demographic info (age, sex, left/right handed, participant ID)
     SUBJECT = D(d).log.log.Subject;
     AGE = D(d).log.log.Age;
     GENDER = D(d).log.log.Gender;
@@ -47,23 +47,23 @@ for d = 1:length(D)  % datasets
     % get trial starts
     trialstarts = tt(strcmp(D(d).log.log.ev.type,'StimStart'));
     tsi = find(strcmp(D(d).log.log.ev.type,'StimStart'));
-    
+
     % get trial stops
     trialstops = tt(strcmp(D(d).log.log.ev.type,'StimStop'));
     tssi = find(strcmp(D(d).log.log.ev.type,'StimStop'));
-    
+
     % get prestim key-left
     ps_kli = find(strcmp(D(d).log.log.ev.type,'PreStimResponse').*strcmp(D(d).log.log.ev.info,'LeftArrow'));
     ps_keyleft = tt(ps_kli);
-    
+
     % get prestim key-right
     ps_kri = find(strcmp(D(d).log.log.ev.type,'PreStimResponse').*strcmp(D(d).log.log.ev.info,'RightArrow'));
     ps_keyright = tt(ps_kri);
-    
+
     % get stim key-left
     s_kli = find(strcmp(D(d).log.log.ev.type,'PostStimResponse').*strcmp(D(d).log.log.ev.info,'LeftArrow'));
     s_keyleft = tt(s_kli);
-    
+
     % get stim key-right
     s_kri = find(strcmp(D(d).log.log.ev.type,'PostStimResponse').*strcmp(D(d).log.log.ev.info,'RightArrow'));
     s_keyright = tt(s_kri);
@@ -88,146 +88,181 @@ for d = 1:length(D)  % datasets
         BlockNr = D(d).log.settings.expt.blockorder(b);
         fprintf(['Block ' num2str(BlockNr) '\n']);
         BlockType = D(d).log.settings.block(BlockNr).reportmode;
-        nTrials = length(D(d).log.settings.block(BlockNr).trials);
-        trialsthisblock = firstblocktrial:firstblocktrial+nTrials-1;
         
+        nTrials = length(D(d).log.log.block(b).trial);
+        trialsthisblock = firstblocktrial:firstblocktrial+nTrials-1;
+
         ttb=0;
         for ti = 1:nTrials
-            TrialNr = trialsthisblock(ti); 
-            ttb = ttb+1;
-            TrialType = D(d).log.settings.block(BlockNr).trials(ttb);
+            TrialNr = trialsthisblock(ti);
+            
+            TrialType = D(d).log.log.block(b).trial(ti).T;
+            % TrialType = D(d).log.settings.block(BlockNr).trials(ti);
 
             PreStim = D(d).log.settings.trialtype(TrialType).prestim;
             StimEye1 = D(d).log.settings.trialtype(TrialType).eye(1).stim;
             StimEye2 = D(d).log.settings.trialtype(TrialType).eye(2).stim;
             Attention = D(d).log.settings.prestim(PreStim).attentiontype;
 
-            psi_now = psstarts(ti);
-            switch Attention
-                case 'exogenous'
-                    PrestimResponse = 'none';
-                    PreStimEnd = NaN;
-                    PreStimTransient = D(d).log.settings.prestim(PreStim).transient.stim;
-                case 'endogenous'
-                    l1 = find(ps_keyleft > psi_now, 1, 'first');
-                    r1 = find(ps_keyright > psi_now, 1, 'first');
-                    if l1 < r1
-                        PrestimResponse = 'left';
+            if TrialNr<=length(psstarts) && TrialNr<=length(trialstarts)
+                psi_now = psstarts(TrialNr);
+                switch Attention
+                    case 'exogenous'
+                        PrestimResponse = 'none';
+                        PreStimEnd = NaN;
+                        PreStimTransient = D(d).log.settings.prestim(PreStim).transient.stim;
+                    case 'endogenous'
+                        l1 = find(ps_keyleft > psi_now, 1, 'first');
+                        r1 = find(ps_keyright > psi_now, 1, 'first');
+                        if isempty(r1) && ~isempty(l1)
+                            PrestimResponse = 'left';
+                        elseif isempty(l1) && ~isempty(r1)
+                            PrestimResponse = 'right';
+                        elseif ps_keyleft(l1) < ps_keyright(r1)
+                            PrestimResponse = 'left';
+                        elseif ps_keyleft(l1) > ps_keyright(r1)
+                            PrestimResponse = 'right';    
+                        else
+                            PrestimResponse = 'none';
+                        end
+                        %PreStimEnd = D(d).log.settings.prestim(PreStim).driftspeed(2,1);
+                        PreStimEnd = D(d).log.settings.prestim(PreStim).orientations(...
+                           D(d).log.settings.prestim(PreStim).trackstim,2);
+                        PreStimTransient = NaN;
+                end
+
+                si_now = trialstarts(TrialNr);
+                switch BlockType
+                    case 'key'
+                        l1 = find(s_keyleft > si_now, 1, 'first');
+                        r1 = find(s_keyright > si_now, 1, 'first');
+                        if isempty(r1) && ~isempty(l1)
+                            StimResponse = 'left';
+                        elseif isempty(l1) && ~isempty(r1)
+                            StimResponse = 'right';
+                        elseif s_keyleft(l1) < s_keyright(r1)
+                            StimResponse = 'left';
+                        elseif s_keyleft(l1) > s_keyright(r1)
+                            StimResponse = 'right';
+                        else
+                            StimResponse = 'none';
+                        end
+                    case 'none'
+                        StimResponse  = 'none';
+                end
+
+
+                % eye ----
+                % take signal from first second
+                duration = 1.5;
+                ei1 = find(eyeT2 >= si_now - 1, 1, 'first');
+                ei2 = find(eyeT2 <= si_now + duration, 1, 'last');
+                EYEX = eyeX(ei1:ei2);
+                % linear regression
+                timeeye = eyeT2(ei1:ei2);
+                incidx = ~isnan(EYEX) & ...
+                    (timeeye>=si_now+0.2) & (timeeye<=si_now+1.2);
+
+                warning off
+                lm = fitlm(timeeye(incidx),EYEX(incidx));
+                slope = lm.Coefficients.Estimate("x1");
+                pval = lm.Coefficients.pValue("x1");
+                warning on
+                % some simple values
+                dEYE_SUM = sum(diff(EYEX(incidx)));
+                dEYE_MEAN = mean(diff(EYEX(incidx)));
+                dEYE_STD = std(diff(EYEX(incidx)));
+                % --------
+
+                % figure
+                if length(timeeye) > 2 
+                    DoFig = true;
+                    if DoFig
+                        f=figure('visible','off');
+
+                        x = EYEX; t = timeeye;
+                        v = (diff(x))*60; % velocity in deg/s
+                        tv = t(2:end);
+                        sw = round(60*0.5); % smoothing window 500 ms
+
+                        subplot(2,1,1); hold off;
+                        plot(t,x,'o-'); hold on;
+                        plot([t(1) t(end)],[0 0],'w');
+
+                        xlowess = smooth(t,x,30,'loess');
+                        v = (diff(xlowess))*60; % velocity in deg/s
+                        sw = round(60/10); % smoothing window 100 ms
+                        plot(t,xlowess,'r-','LineWidth',2)
+
+                        plot([si_now si_now],[-1,1]*max(abs(x)),'y');
+                        plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(x)),'y--');
+                        plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(x)),'y--');
+                        plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(x)),'y--');
+                        plot(timeeye(incidx),lm.Coefficients.Estimate("x1")*timeeye(incidx) + ...
+                            lm.Coefficients.Estimate("(Intercept)"),'g-');
+                        yr = max(abs(x(t>si_now & t<si_now+1)));
+                        if ~isnan(yr) && yr
+                            set(gca,'xlim',[si_now-0.5 si_now+1.5],'ylim',[-1,1]*yr);
+                        else
+                            set(gca,'xlim',[si_now-0.5 si_now+1.5]);
+                        end
+                        title('X position with LOWESS smoothing @100ms')
+
+                        subplot(2,1,2); hold off;
+                        yrr = smooth(v,sw);
+                        yr = max(abs(yrr(tv>si_now & tv<si_now+1)));
+                        plot([t(1) t(end)],[0 0],'w'); hold on;
+                        plot(tv,smooth(v,sw),'r-','LineWidth',2);
+                        plot([si_now si_now],[-1,1]*max(abs(smooth(v,sw))),'y');
+                        plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(smooth(v,sw))),'y--');
+                        plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(smooth(v,sw))),'y--');
+                        plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(smooth(v,sw))),'y--');
+                        if ~isnan(yr) && yr
+                            set(gca,'xlim',[si_now-0.5 si_now+1.5],...
+                                'ylim',[-1,1]*max(abs(smooth(v,sw))));
+                        else
+                            set(gca,'xlim',[si_now-0.5 si_now+1.5]);
+                        end
+                        sgtitle(['Eyetrace --- ' SUBJECT ' B-' num2str(BlockNr) ...
+                            ' T-' num2str(TrialNr)]);
+
+                        idx = (tv>=si_now+0.2) & (tv<=si_now+1.2);
+                        mVel1000 = mean(smooth(v(idx),sw));
+                        idx = (tv>=si_now+0.2) & (tv<=si_now+0.7);
+                        mVel500 = mean(smooth(v(idx),sw));
+                        title(sprintf(['Horizontal velocity\nmVel500 = ' num2str(mVel500) ...
+                            ', mVel1000 = ' num2str(mVel1000)]));
+
+                        [~,~] = mkdir('NZ_eye');
+                        fn = ['eye_csvrow_'  sprintf('%03d', row) '.png'];
+                        set(gcf,"Position",[100 100 400 800], 'InvertHardcopy', 'off')
+                        saveas(f,fullfile('NZ_eye',fn));
+                        close(f);
                     else
-                        PrestimResponse = 'right';
+                        x = EYEX; t = timeeye;
+                        tv = t(2:end);
+                        xlowess = smooth(t,x,30,'loess');
+                        v = (diff(xlowess))*60; % velocity in deg/s
+                        sw = round(60/10); % smoothing window 100 ms
+
+                        idx = (tv>=si_now+0.2) & (tv<=si_now+1.2);
+                        mVel1000 = mean(smooth(v(idx),sw));
+                        idx = (tv>=si_now+0.2) & (tv<=si_now+0.7);
+                        mVel500 = mean(smooth(v(idx),sw));
                     end
-                    PreStimEnd = D(d).log.settings.prestim(PreStim).driftspeed(2,1);
-                    PreStimTransient = NaN;
+
+                else
+                    mVel1000 = NaN;
+                    mVel500 = NaN;
+                end
+                newRow = {SessNr,SessFld,SUBJECT,str2double(AGE),GENDER,HANDEDNESS,...
+                    BlockNr,BlockType,TrialNr,TrialType,PreStim,StimEye1,StimEye2,...
+                    Attention,PrestimResponse,PreStimEnd,PreStimTransient,...
+                    StimResponse,slope,pval,dEYE_MEAN,dEYE_SUM,dEYE_STD,mVel500,mVel1000};
+                T = [T; newRow];
+
+                row = row+1;
             end
-            
-            si_now = trialstarts(ti);
-            switch BlockType
-                case 'key'
-                    l1 = find(s_keyleft > si_now, 1, 'first');
-                    r1 = find(s_keyright > si_now, 1, 'first');
-                    if l1 < r1
-                        StimResponse = 'left';
-                    else
-                        StimResponse = 'right';
-                    end
-                case 'none'
-                    StimResponse  = 'none';
-            end
-
-
-            % eye ----
-            % take signal from first second
-            duration = 1.5;
-            ei1 = find(eyeT2 >= si_now - 1, 1, 'first');
-            ei2 = find(eyeT2 <= si_now + duration, 1, 'last');
-            EYEX = eyeX(ei1:ei2);
-            % linear regression
-            timeeye = eyeT2(ei1:ei2);
-            incidx = ~isnan(EYEX) & ...
-                (timeeye>=si_now+0.2) & (timeeye<=si_now+1.2);
-                        
-            warning off
-            lm = fitlm(timeeye(incidx),EYEX(incidx));
-            slope = lm.Coefficients.Estimate("x1");
-            pval = lm.Coefficients.pValue("x1");
-            warning on
-            % some simple values
-            dEYE_SUM = sum(diff(EYEX(incidx)));
-            dEYE_MEAN = mean(diff(EYEX(incidx)));
-            dEYE_STD = std(diff(EYEX(incidx)));
-            % --------
-              
-            % figure
-            if row ==1
-                f=figure('visible','off');
-            end
-
-            x = EYEX; t = timeeye;
-            v = (diff(x))*60; % velocity in deg/s
-            sw = round(60*0.5); % smoothing window 500 ms
-
-            subplot(2,1,1); hold off;
-            plot(t,x,'o-'); hold on;
-            plot([t(1) t(end)],[0 0],'w');
-            if exist('malowess','file') == 2
-                xlowess = smooth(t,x,30,'loess');
-                %xlowess = malowess(t,x,Span=0.2);
-                v = (diff(xlowess))*60; % velocity in deg/s
-                sw = round(60/10); % smoothing window 100 ms
-                plot(t,xlowess,'r-','LineWidth',2)
-            end
-
-            plot([si_now si_now],[-1,1]*max(abs(x)),'y');
-            plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(x)),'y--');
-            plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(x)),'y--');
-            plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(x)),'y--');
-            plot(timeeye(incidx),lm.Coefficients.Estimate("x1")*timeeye(incidx) + ...
-                lm.Coefficients.Estimate("(Intercept)"),'g-');
-            yr = max(abs(x(t>si_now & t<si_now+1)));
-            if ~isnan(yr) && yr
-                set(gca,'xlim',[si_now-0.5 si_now+1.5],'ylim',[-1,1]*yr);
-            else
-                set(gca,'xlim',[si_now-0.5 si_now+1.5]);
-            end
-            title('X position with LOWESS smoothing @100ms')
-
-            subplot(2,1,2); hold off;
-            yrr = smooth(v,sw);
-            yr = max(abs(yrr(t>si_now & t<si_now+1)));
-            plot([t(1) t(end)],[0 0],'w'); hold on;
-            plot(t(2:end),smooth(v,sw),'r-','LineWidth',2); 
-            plot([si_now si_now],[-1,1]*max(abs(smooth(v,sw))),'y');
-            plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(smooth(v,sw))),'y--');
-            plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(smooth(v,sw))),'y--');
-            plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(smooth(v,sw))),'y--');
-            if ~isnan(yr) && yr
-                set(gca,'xlim',[si_now-0.5 si_now+1.5],...
-                    'ylim',[-1,1]*max(abs(smooth(v,sw))));
-            else
-                set(gca,'xlim',[si_now-0.5 si_now+1.5]);
-            end
-            sgtitle(['Eyetrace --- ' SUBJECT ' B-' num2str(BlockNr) ...
-                ' T-' num2str(TrialNr)]);
-
-            idx = (t>=si_now+0.2) & (t<=si_now+1.2);
-            mVel1000 = mean(smooth(v(idx),sw));
-            idx = (t>=si_now+0.2) & (t<=si_now+0.7);
-            mVel500 = mean(smooth(v(idx),sw));
-            title(sprintf(['Horizontal velocity\nmVel500 = ' num2str(mVel500) ...
-                ', mVel1000 = ' num2str(mVel1000)]));
-            
-            [~,~] = mkdir('NZ_eye');
-            fn = ['eye_csvrow_'  sprintf('%03d', row) '.png'];
-            set(gcf,"Position",[100 100 400 800], 'InvertHardcopy', 'off')
-            saveas(f,fullfile('NZ_eye',fn));
-
-            newRow = {SessNr,SessFld,SUBJECT,str2double(AGE),GENDER,HANDEDNESS,...
-                BlockNr,BlockType,TrialNr,TrialType,PreStim,StimEye1,StimEye2,...
-                Attention,PrestimResponse,PreStimEnd,PreStimTransient,...
-                StimResponse,slope,pval,dEYE_MEAN,dEYE_SUM,dEYE_STD,mVel500,mVel1000};
-            T = [T; newRow];
-
-            row = row+1;
         end
         firstblocktrial = trialsthisblock(end)+1;
     end

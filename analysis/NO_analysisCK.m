@@ -73,7 +73,8 @@ for d = 1:length(D)  % datasets
         BlockNr = D(d).log.settings.expt.blockorder(b);
         fprintf(['Block ' num2str(BlockNr) '\n']);
         BlockType = D(d).log.settings.block(BlockNr).reportmode;
-        nTrials = length(D(d).log.settings.block(BlockNr).trials);
+        
+        nTrials = length(D(d).log.log.block(b).trial);
         trialsthisblock = firstblocktrial:firstblocktrial+nTrials-1;
         EPOCHS(d).Block(b).Type = BlockType;
 
@@ -81,12 +82,14 @@ for d = 1:length(D)  % datasets
         for ti = 1:nTrials
             TrialNr = trialsthisblock(ti); 
             ttb = ttb+1;
-            TrialType = D(d).log.settings.block(BlockNr).trials(ttb);
+            %TrialType = D(d).log.settings.block(BlockNr).trials(ttb);
+            TrialType = D(d).log.log.block(b).trial(ti).T;
+
             StimEye1 = D(d).log.settings.trialtype(TrialType).eye(1).stim;
             StimEye2 = D(d).log.settings.trialtype(TrialType).eye(2).stim;
           
-            si_now = trialstarts(ti);
-            si_stop = trialstops(ti);
+            si_now = trialstarts(TrialNr);
+            si_stop = trialstops(TrialNr);
 
             switch BlockType
                 case 'key'
@@ -118,20 +121,20 @@ for d = 1:length(D)  % datasets
                     thp = vv>vth(1);
                     dthp = [0; diff(thp)>0];
                     vstart = t(dthp>0);
-                    % ff=figure('visible','off');hold on;
-                    % plot(t,abs(v(1,:)));
-                    % plot(t,vv,'r-','LineWidth',2);
-                    % plot([0 t(end)],[vth(2) vth(2)],'y-');
-                    % plot([0 t(end)],[vth(1) vth(1)],'y--')
-                    % plot([vstart' vstart'], [0 max(abs(v(1,:)))], 'g-');
+                    ff=figure('visible','off');hold on;
+                    plot(t,abs(v(1,:)));
+                    plot(t,vv,'r-','LineWidth',2);
+                    plot([0 t(end)],[vth(2) vth(2)],'y-');
+                    plot([0 t(end)],[vth(1) vth(1)],'y--')
+                    plot([vstart' vstart'], [0 max(abs(v(1,:)))], 'g-');
                     voiceepochs = [vstart(2:end-1)'  diff(vstart(2:end))'];
 
-                    % [~,~] = mkdir('NO_epochs');
-                    % fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
-                    %     '_T-' sprintf('%02d',TrialNr)  '_VOICE.png'];
-                    % set(ff,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
-                    % saveas(ff,fullfile('NO_epochs','figs',fn));
-                    % close(ff);
+                    [~,~] = mkdir('NO_epochs');
+                    fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
+                        '_T-' sprintf('%02d',TrialNr)  '_VOICE.png'];
+                    set(ff,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
+                    saveas(ff,fullfile('NO_epochs','figs',fn));
+                    close(ff);
 
                     EPOCHS(d).Block(b).Trial(TrialNr).epochsvoice = voiceepochs;
                     EPOCHS(d).Block(b).Trial(TrialNr).epochsvoice_hdr = ...
@@ -150,71 +153,72 @@ for d = 1:length(D)  % datasets
             v = (diff(x))*60; % velocity in deg/s
             sw = round(60*0.5); % smoothing window 500 ms
             
-            % figure
-            % f=figure('visible','off');
-            % subplot(3,1,1); hold off;
-            % plot(t,x,'o-'); hold on;
-            % plot([t(1) t(end)],[0 0],'w');
-            % title('X position with LOWESS smoothing @100ms')
-            sdur = si_stop-si_now;
-            span = (1*60)./(sdur*60);
-            span = 30;
-            if exist('malowess','file') == 2
-                %xlowess = malowess(t,x,Span=span);
+            if sum(~isnan(x))>5
+                f=figure('visible','off');
+                subplot(3,1,1); hold off;
+                plot(t,x,'o-'); hold on;
+                plot([t(1) t(end)],[0 0],'w');
+                title('X position with LOWESS smoothing @100ms')
+                sdur = si_stop-si_now;
+                span = (1*60)./(sdur*60);
+                span = 30;
+
                 xlowess = smooth(t,x,30,'loess');
                 v = (diff(xlowess))*60; % velocity in deg/s
                 sw = round(60/10); % smoothing window 100 ms
                 plot(t,xlowess,'r-','LineWidth',2)
-            end 
 
-            % % acceleration
-            % subplot(3,1,2); hold off;
-            % plot([t(1) t(end)],[0 0],'w'); hold on;
-            % plot(t(3:end),abs(diff(v)),'g-','LineWidth',2); 
-            % title(sprintf(['Acceleration dva/s2']));
-            % 
-            % % velocity
-            % subplot(3,1,3); hold off;
-            % plot([t(1) t(end)],[0 0],'w'); hold on;
-            % area(t(2:end),smooth(v,sw)); 
-            % plot(t(2:end),smooth(v,sw),'r-','LineWidth',2); 
-            % title(sprintf('Horizontal velocity dva/s'));
+                % acceleration
+                subplot(3,1,2); hold off;
+                plot([t(1) t(end)],[0 0],'w'); hold on;
+                plot(t(3:end),abs(diff(v)),'g-','LineWidth',2);
+                title(sprintf(['Acceleration dva/s2']));
 
+                % velocity
+                subplot(3,1,3); hold off;
+                plot([t(1) t(end)],[0 0],'w'); hold on;
+                area(t(2:end),smooth(v,sw));
+                plot(t(2:end),smooth(v,sw),'r-','LineWidth',2);
+                title(sprintf('Horizontal velocity dva/s'));
 
-            % detect zero crossings
-            signal = smooth(v,sw);
-            vt=t(2:end);
-            pos = signal>0;
-            neg = signal<0';
+                % detect zero crossings
+                signal = smooth(v,sw);
+                vt=t(2:end);
+                pos = signal>0;
+                neg = signal<0';
 
-            changepol = diff(pos) ~= 0;
-            cp = logical([0 changepol']);
-            % plot([vt(cp)' vt(cp)'],[-0.5  0.5],'y-');
-            % 
-            % sgtitle(['Eyetrace --- ' SUBJECT ' B-' num2str(BlockNr) ...
-            %     ' T-' num2str(TrialNr)]);
+                changepol = diff(pos) ~= 0;
+                cp = logical([0 changepol']);
+                plot([vt(cp)' vt(cp)'],[-0.5  0.5],'y-');
 
-            zct = vt(cp); zcv = signal(cp);
-            eyeepochs = []; eei = 1;
-            for zci = 1:length(zct)-1
-                epochdur = zct(zci+1)-zct(zci);
-                epochstart = zct(zci);
-                epochval = zcv(zci);
-                eyeepochs = [eyeepochs; ...
-                    epochstart epochdur epochval epochval./abs(epochval)];
+                sgtitle(['Eyetrace --- ' SUBJECT ' B-' num2str(BlockNr) ...
+                    ' T-' num2str(TrialNr)]);
+
+                zct = vt(cp); zcv = signal(cp);
+                eyeepochs = []; eei = 1;
+                for zci = 1:length(zct)-1
+                    epochdur = zct(zci+1)-zct(zci);
+                    epochstart = zct(zci);
+                    epochval = zcv(zci);
+                    eyeepochs = [eyeepochs; ...
+                        epochstart epochdur epochval epochval./abs(epochval)];
+                end
+
+                [~,~] = mkdir('NO_epochs','figs');
+                fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
+                    '_T-' sprintf('%02d',TrialNr)  '_EYE.png'];
+                set(f,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
+                saveas(f,fullfile('NO_epochs','figs',fn));
+                close(f);
+
+                EPOCHS(d).Block(b).Trial(TrialNr).epochseye = eyeepochs;
+                EPOCHS(d).Block(b).Trial(TrialNr).epochseye_hdr = ...
+                    {'start(s)','dur(s)','mVal','Percept'};
+            else
+                EPOCHS(d).Block(b).Trial(TrialNr).epochseye = [];
+                EPOCHS(d).Block(b).Trial(TrialNr).epochseye_hdr = ...
+                    {'start(s)','dur(s)','mVal','Percept'};
             end
-
-            % [~,~] = mkdir('NO_epochs','figs');
-            % fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
-            %     '_T-' sprintf('%02d',TrialNr)  '_EYE.png'];
-            % set(f,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
-            % saveas(f,fullfile('NO_epochs','figs',fn));
-            % close(f);
-
-            EPOCHS(d).Block(b).Trial(TrialNr).epochseye = eyeepochs;
-            EPOCHS(d).Block(b).Trial(TrialNr).epochseye_hdr = ...
-                {'start(s)','dur(s)','mVal','Percept'};
-
         end
         firstblocktrial = trialsthisblock(end)+1;
     end
