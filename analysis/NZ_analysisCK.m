@@ -4,6 +4,7 @@ AnalysisFld = '/Users/chris/Documents/TEACHING/UU/PF/UCU_thesis/2024/BR_UCU/anal
 cd(DataFld);
 contents = dir('NZ*');
 folders = contents([contents.isdir]);
+FigType = 'fig';
 
 %% Load the data
 for f = 1:length(folders)
@@ -233,10 +234,18 @@ for d = 1:length(D)  % datasets
                         title(sprintf(['Horizontal velocity\nmVel500 = ' num2str(mVel500) ...
                             ', mVel1000 = ' num2str(mVel1000)]));
 
-                        [~,~] = mkdir('NZ_eye');
-                        fn = ['eye_csvrow_'  sprintf('%03d', row) '.png'];
-                        set(gcf,"Position",[100 100 400 800], 'InvertHardcopy', 'off')
-                        saveas(f,fullfile('NZ_eye',fn));
+                        switch FigType
+                            case 'fig'
+                                set(f,'Visible','on');
+                                [~,~] = mkdir(fullfile('NZ_eye','fig'));
+                                fn = ['eye_csvrow_'  sprintf('%03d', row) '.fig'];
+                                saveas(f,fullfile('NZ_eye','fig',fn));
+                            case 'opng'
+                                [~,~] = mkdir(fullfile('NZ_eye','png'));
+                                fn = ['eye_csvrow_'  sprintf('%03d', row) '.png'];
+                                set(gcf,"Position",[100 100 400 800], 'InvertHardcopy', 'off')
+                                saveas(f,fullfile('NZ_eye','png',fn));
+                        end
                         close(f);
                     else
                         x = EYEX; t = timeeye;
@@ -269,5 +278,5 @@ for d = 1:length(D)  % datasets
 end
 
 %% Save the results
-T = cell2table(T,"VariableNames",vNames);
-writetable(T,'NZ_RESULTS.csv')
+% T = cell2table(T,"VariableNames",vNames);
+% writetable(T,'NZ_RESULTS.csv')
