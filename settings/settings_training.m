@@ -4,7 +4,7 @@ monitor.distance = 690;
 monitor.fliphorizontal = true; 
 monitor.stereomode = 4; 
 monitor.maxpenwidth = 7; 
-monitor.DebugMode = 'NoDebug'; 
+monitor.DebugMode = 'NoDebug'; %-> how to  
 
 % eyetracker ---
 eyetracker.do = false; 
@@ -69,7 +69,7 @@ stim(2).overlay.orientation = 'vertical';
 stim(2).overlay.driftspeed = -2;
 
 stim(3).type = 'image';
-stim(3).image = 'sad_real.jpg';
+stim(3).image = 'surprised_real.jpg';
 stim(3).overlay.type = 'lines';
 stim(3).overlay.linewidth = 0.1;
 stim(3).overlay.linedensity = 3;
@@ -79,7 +79,7 @@ stim(3).overlay.orientation = 'vertical';
 stim(3).overlay.driftspeed = 1.5;
 
 stim(4).type = 'image';
-stim(4).image = 'sad_real.jpg';
+stim(4).image = 'surprised_real.jpg';
 stim(4).overlay.type = 'lines';
 stim(4).overlay.linewidth = 0.1;
 stim(4).overlay.linedensity = 3;

@@ -4,12 +4,12 @@ monitor.distance = 690;
 monitor.fliphorizontal = true; 
 monitor.stereomode = 4; 
 monitor.maxpenwidth = 7; 
-monitor.DebugMode = 'NoDebug'; 
+monitor.DebugMode = 'NoDebug'; %-> NoDebug during experiment 'CKHOME'?
 
 % eyetracker ---
-eyetracker.do = false; 
+eyetracker.do = false; %-> true during experiment 
 eyetracker.type = 'Tobii Pro Fusion'; 
-eyetracker.calibrate = true; 
+eyetracker.calibrate = false; % -> true during experiment
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; 
 
 % sound ---
@@ -24,7 +24,7 @@ sound.beepfile = 'beep.wav';
 
 % keys ---
 keys.esc = 'ESCAPE'; 
-keys.resp = {'LeftArrow','DownArrow','RightArrow'}; %-> not sure if I have done this correctly  
+keys.resp = {'LeftArrow','RightArrow'}; 
 
 % log location ---
 log.fld = 'log_BA'; 
@@ -43,7 +43,7 @@ bg.align.AlignCircles.SizeRange = [.5 1];
 bg.align.AlignCircles.OpenArea = [8 8];
 
 % fixation dot
-fix.size = 0.2;  % -> enlarge? 
+fix.size = 0.2;  
 fix.color = [1 0 0];
 
 % stimuli
@@ -53,7 +53,7 @@ stim(1).image = 'happy_real.jpg';
 stim(1).overlay.type = 'lines';
 stim(1).overlay.linewidth = 0.1;
 stim(1).overlay.linedensity = 3;
-stim(1).overlay.color = [0 0 0];
+stim(1).overlay.color = [0 0 0]; %-> 255 0 0 
 stim(1).overlay.opacity = 0.7;
 stim(1).overlay.orientation = 'vertical';
 stim(1).overlay.driftspeed = 2;
@@ -69,7 +69,7 @@ stim(2).overlay.orientation = 'vertical';
 stim(2).overlay.driftspeed = -2;
 
 stim(3).type = 'image';
-stim(3).image = 'sad_real.jpg';
+stim(3).image = 'surprised_real.jpg';
 stim(3).overlay.type = 'lines';
 stim(3).overlay.linewidth = 0.1;
 stim(3).overlay.linedensity = 3;
@@ -79,7 +79,7 @@ stim(3).overlay.orientation = 'vertical';
 stim(3).overlay.driftspeed = 1.5;
 
 stim(4).type = 'image';
-stim(4).image = 'sad_real.jpg';
+stim(4).image = 'surprised_real.jpg';
 stim(4).overlay.type = 'lines';
 stim(4).overlay.linewidth = 0.1;
 stim(4).overlay.linedensity = 3;
@@ -226,8 +226,8 @@ block(1).reportmode = 'key';
 block(1).trials = [2,3,4,5,6,7,8,9]; 
 block(1).randomizetrials = true;
 block(1).repeattrials = 2;
-block(1).instruction = ['Click the left key to report emotional faces\n' ...
-    'Click the center key to report neutral faces\n Click the right key to report if you are unsure.\n\nPress any key to start'];
+block(1).instruction = ['Hold the left key to report emotional faces\n' ...
+    'Hold the right key to report neutral faces \n Release keys if you are unsure.\n\nPress any key to start'];
 
 % block: no report 
 block(2).reportmode = 'none'; 
