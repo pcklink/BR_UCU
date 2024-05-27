@@ -4,6 +4,7 @@ AnalysisFld = '/Users/chris/Documents/TEACHING/UU/PF/UCU_thesis/2024/BR_UCU/anal
 cd(DataFld);
 contents = dir('NZ*');
 folders = contents([contents.isdir]);
+FigType = 'fig';
 
 %% Load the data
 for f = 1:length(folders)
@@ -194,10 +195,10 @@ for d = 1:length(D)  % datasets
                         sw = round(60/10); % smoothing window 100 ms
                         plot(t,xlowess,'r-','LineWidth',2)
 
-                        plot([si_now si_now],[-1,1]*max(abs(x)),'y');
-                        plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(x)),'y--');
-                        plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(x)),'y--');
-                        plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(x)),'y--');
+                        plot([si_now si_now],[-1,1]*max(abs(x)),'m');
+                        plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(x)),'m--');
+                        plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(x)),'m--');
+                        plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(x)),'m--');
                         plot(timeeye(incidx),lm.Coefficients.Estimate("x1")*timeeye(incidx) + ...
                             lm.Coefficients.Estimate("(Intercept)"),'g-');
                         yr = max(abs(x(t>si_now & t<si_now+1)));
@@ -213,10 +214,10 @@ for d = 1:length(D)  % datasets
                         yr = max(abs(yrr(tv>si_now & tv<si_now+1)));
                         plot([t(1) t(end)],[0 0],'w'); hold on;
                         plot(tv,smooth(v,sw),'r-','LineWidth',2);
-                        plot([si_now si_now],[-1,1]*max(abs(smooth(v,sw))),'y');
-                        plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(smooth(v,sw))),'y--');
-                        plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(smooth(v,sw))),'y--');
-                        plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(smooth(v,sw))),'y--');
+                        plot([si_now si_now],[-1,1]*max(abs(smooth(v,sw))),'m');
+                        plot([si_now+1.2 si_now+1.2],[-1,1]*max(abs(smooth(v,sw))),'m--');
+                        plot([si_now+0.7 si_now+0.7],[-1,1]*max(abs(smooth(v,sw))),'m--');
+                        plot([si_now+0.2 si_now+0.2],[-1,1]*max(abs(smooth(v,sw))),'m--');
                         if ~isnan(yr) && yr
                             set(gca,'xlim',[si_now-0.5 si_now+1.5],...
                                 'ylim',[-1,1]*max(abs(smooth(v,sw))));
@@ -233,10 +234,20 @@ for d = 1:length(D)  % datasets
                         title(sprintf(['Horizontal velocity\nmVel500 = ' num2str(mVel500) ...
                             ', mVel1000 = ' num2str(mVel1000)]));
 
-                        [~,~] = mkdir('NZ_eye');
-                        fn = ['eye_csvrow_'  sprintf('%03d', row) '.png'];
-                        set(gcf,"Position",[100 100 400 800], 'InvertHardcopy', 'off')
-                        saveas(f,fullfile('NZ_eye',fn));
+                        switch FigType
+                            case 'fig'
+                                set(f,'Visible','on');
+                                [~,~] = mkdir(fullfile('NZ_eye','fig'));
+                                %[~,~] = mkdir(fullfile('NZ_eye','fig_olddesktop'));
+                                fn = ['eye_csvrow_'  sprintf('%03d', row) '.fig'];
+                                saveas(f,fullfile('NZ_eye','fig',fn));
+                                %saveas(f,fullfile('NZ_eye','fig_olddesktop',fn));
+                            case 'opng'
+                                [~,~] = mkdir(fullfile('NZ_eye','png'));
+                                fn = ['eye_csvrow_'  sprintf('%03d', row) '.png'];
+                                set(gcf,"Position",[100 100 400 800], 'InvertHardcopy', 'off')
+                                saveas(f,fullfile('NZ_eye','png',fn));
+                        end
                         close(f);
                     else
                         x = EYEX; t = timeeye;
@@ -269,5 +280,5 @@ for d = 1:length(D)  % datasets
 end
 
 %% Save the results
-T = cell2table(T,"VariableNames",vNames);
-writetable(T,'NZ_RESULTS.csv')
+% T = cell2table(T,"VariableNames",vNames);
+% writetable(T,'NZ_RESULTS.csv')

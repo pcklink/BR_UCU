@@ -4,6 +4,7 @@ AnalysisFld = '/Users/chris/Documents/TEACHING/UU/PF/UCU_thesis/2024/BR_UCU/anal
 cd(DataFld);
 contents = dir('NO*');
 folders = contents([contents.isdir]);
+FigType = 'fig';
 
 %% Load the data
 for f = 1:length(folders)
@@ -121,21 +122,30 @@ for d = 1:length(D)  % datasets
                     thp = vv>vth(1);
                     dthp = [0; diff(thp)>0];
                     vstart = t(dthp>0);
-                    ff=figure('visible','off');hold on;
+                    ff=figure('visible','on');hold on;
                     plot(t,abs(v(1,:)));
                     plot(t,vv,'r-','LineWidth',2);
-                    plot([0 t(end)],[vth(2) vth(2)],'y-');
-                    plot([0 t(end)],[vth(1) vth(1)],'y--')
+                    plot([0 t(end)],[vth(2) vth(2)],'m-');
+                    plot([0 t(end)],[vth(1) vth(1)],'m--')
                     plot([vstart' vstart'], [0 max(abs(v(1,:)))], 'g-');
                     voiceepochs = [vstart(2:end-1)'  diff(vstart(2:end))'];
-
-                    [~,~] = mkdir('NO_epochs');
-                    fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
-                        '_T-' sprintf('%02d',TrialNr)  '_VOICE.png'];
-                    set(ff,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
-                    saveas(ff,fullfile('NO_epochs','figs',fn));
+                    switch FigType
+                        case 'png'
+                            fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
+                                '_T-' sprintf('%02d',TrialNr)  '_VOICE.png'];
+                            [~,~] = mkdir(fullfile('NO_epochs','figs','png'));
+                            set(ff,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
+                            saveas(ff,fullfile('NO_epochs','figs','png',fn));
+                        case 'fig'
+                            fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
+                                '_T-' sprintf('%02d',TrialNr)  '_VOICE.fig'];
+                            %set(ff,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
+                            %[~,~] = mkdir(fullfile('NO_epochs','figs','fig'));
+                            [~,~] = mkdir(fullfile('NO_epochs','figs','fig_olddesktop'));
+                            %saveas(ff,fullfile('NO_epochs','figs','fig',fn));
+                            saveas(ff,fullfile('NO_epochs','figs','fig_olddesktop',fn));
+                    end
                     close(ff);
-
                     EPOCHS(d).Block(b).Trial(TrialNr).epochsvoice = voiceepochs;
                     EPOCHS(d).Block(b).Trial(TrialNr).epochsvoice_hdr = ...
                         {'start(s)','dur(s)'};
@@ -154,7 +164,7 @@ for d = 1:length(D)  % datasets
             sw = round(60*0.5); % smoothing window 500 ms
             
             if sum(~isnan(x))>5
-                f=figure('visible','off');
+                f=figure('visible','on');
                 subplot(3,1,1); hold off;
                 plot(t,x,'o-'); hold on;
                 plot([t(1) t(end)],[0 0],'w');
@@ -189,7 +199,7 @@ for d = 1:length(D)  % datasets
 
                 changepol = diff(pos) ~= 0;
                 cp = logical([0 changepol']);
-                plot([vt(cp)' vt(cp)'],[-0.5  0.5],'y-');
+                plot([vt(cp)' vt(cp)'],[-0.5  0.5],'m-');
 
                 sgtitle(['Eyetrace --- ' SUBJECT ' B-' num2str(BlockNr) ...
                     ' T-' num2str(TrialNr)]);
@@ -204,11 +214,24 @@ for d = 1:length(D)  % datasets
                         epochstart epochdur epochval epochval./abs(epochval)];
                 end
 
-                [~,~] = mkdir('NO_epochs','figs');
-                fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
+                
+
+                switch FigType
+                    case 'png'
+                        fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
                     '_T-' sprintf('%02d',TrialNr)  '_EYE.png'];
-                set(f,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
-                saveas(f,fullfile('NO_epochs','figs',fn));
+                        [~,~] = mkdir(fullfile('NO_epochs','figs','png'));
+                        set(f,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
+                        saveas(f,fullfile('NO_epochs','figs','png',fn));
+                    case 'fig'
+                        fn = ['Sub-' SUBJECT '_Sess-' num2str(d) '_B-' num2str(b) ...
+                    '_T-' sprintf('%02d',TrialNr)  '_EYE.fig'];
+                        %set(f,"Position",[100 100 1200 800], 'InvertHardcopy', 'off')
+                        %[~,~] = mkdir(fullfile('NO_epochs','figs','fig'));
+                        [~,~] = mkdir(fullfile('NO_epochs','figs','fig_olddesktop'));
+                        %saveas(f,fullfile('NO_epochs','figs','fig',fn));
+                        saveas(f,fullfile('NO_epochs','figs','fig_olddesktop',fn));
+                end
                 close(f);
 
                 EPOCHS(d).Block(b).Trial(TrialNr).epochseye = eyeepochs;
@@ -224,10 +247,10 @@ for d = 1:length(D)  % datasets
     end
 end
 
-%% Save the results
-[~,~] = mkdir('NO_epochs','data');
-for i=1:length(EPOCHS)
-    epochs = EPOCHS(i);
-    session = folders(i).name;
-    save(fullfile('NO_epochs','data',['epochs_' session]),'epochs','session');
-end
+% %% Save the results
+% [~,~] = mkdir('NO_epochs','data');
+% for i=1:length(EPOCHS)
+%     epochs = EPOCHS(i);
+%     session = folders(i).name;
+%     save(fullfile('NO_epochs','data',['epochs_' session]),'epochs','session');
+% end

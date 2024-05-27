@@ -2,3 +2,7 @@
 log/
 
 .idea/
+
+analysis/NO_epochs/figs/fig_olddesktop/
+
+analysis/NO_epochs/figs/fig/
