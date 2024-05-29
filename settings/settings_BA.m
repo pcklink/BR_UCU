@@ -50,6 +50,7 @@ fix.color = [1 0 0];
 
 stim(1).type = 'image';
 stim(1).image = 'happy_real.jpg';
+stim(1).rotation = 180;
 stim(1).overlay.type = 'lines';
 stim(1).overlay.linewidth = 0.1;
 stim(1).overlay.linedensity = 3;
@@ -60,6 +61,7 @@ stim(1).overlay.driftspeed = 2;
 
 stim(2).type = 'image';
 stim(2).image = 'happy_real.jpg';
+stim(2).rotation = 0;
 stim(2).overlay.type = 'lines';
 stim(2).overlay.linewidth = 0.1;
 stim(2).overlay.linedensity = 3;
@@ -70,6 +72,7 @@ stim(2).overlay.driftspeed = -2;
 
 stim(3).type = 'image';
 stim(3).image = 'surprised_real.jpg';
+stim(3).rotation = 0;
 stim(3).overlay.type = 'lines';
 stim(3).overlay.linewidth = 0.1;
 stim(3).overlay.linedensity = 3;
@@ -80,6 +83,7 @@ stim(3).overlay.driftspeed = 1.5;
 
 stim(4).type = 'image';
 stim(4).image = 'surprised_real.jpg';
+stim(4).rotation = 0;
 stim(4).overlay.type = 'lines';
 stim(4).overlay.linewidth = 0.1;
 stim(4).overlay.linedensity = 3;
@@ -90,6 +94,7 @@ stim(4).overlay.driftspeed = -1.5;
 
 stim(5).type = 'image';
 stim(5).image = 'neutral_real.jpg';
+stim(5).rotation = 0;
 stim(5).overlay.type = 'lines';
 stim(5).overlay.linewidth = 0.1;
 stim(5).overlay.linedensity = 3;
@@ -100,6 +105,7 @@ stim(5).overlay.driftspeed = 1.5;
 
 stim(6).type = 'image';
 stim(6).image = 'neutral_real.jpg';
+stim(6).rotation = 0;
 stim(6).overlay.type = 'lines';
 stim(6).overlay.linewidth = 0.1;
 stim(6).overlay.linedensity = 3;
@@ -120,7 +126,7 @@ trialtype(1).time.PrestimT = [];
 trialtype(1).time.PrestimGapT = 0;
 trialtype(1).time.StimT = 5;
 trialtype(1).time.ITIT  = 0;
-trialtype(1).replay = true;
+trialtype(1).replay = false;
 trialtype(1).replayminmax = [1 4];
 trialtype(1).poststimquest = [];
 

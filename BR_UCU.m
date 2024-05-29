@@ -1169,8 +1169,13 @@ try
                             drect = [0 0 StimSizePix(1) StimSizePix(2)];
                             drect = CenterRectOnPoint(drect,...
                                 monitor.center(1),monitor.center(2));
+                            if isfield(stim,'rotation')
+                                rot=stim(ss).rotation;
+                            else
+                                rot=[];
+                            end
                             Screen('DrawTexture', monitor.w,...
-                                stim(ss).imgtex,[],drect);
+                                stim(ss).imgtex,[],drect,rot);
                             switch stim(ss).overlay.type
                                 case 'dots'
                                     if cF == 0 % - first frame
