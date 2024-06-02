@@ -7,7 +7,7 @@ monitor.maxpenwidth = 7;
 monitor.DebugMode = 'NoDebug'; %-> NoDebug during experiment 'CKHOME'
 
 % eyetracker ---
-eyetracker.do = false; 
+eyetracker.do = true; 
 eyetracker.type = 'Tobii Pro Fusion'; 
 eyetracker.calibrate = false; 
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; 
@@ -561,16 +561,29 @@ block(1).reportmode = 'key';
 block(1).trials = [2,3,4,5,6,7,8,9]; 
 block(1).randomizetrials = true;
 block(1).repeattrials = 2;
+block(1).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(1).instruction = ['Hold the left key to report emotional faces\n' ...
     'Hold the right key to report neutral faces \n Release keys if you are unsure.\n\nPress any key to start'];
+% here you can define image to show with the instructions
+block(1).instruct.imgdo = false;
+block(1).instruct.img(1).file = 'happy_real.jpg';
+block(1).instruct.img(1).position = [-2 -3]; 
+block(1).instruct.img(1).size = [3 3];
+block(1).instruct.img(1).rotation = 0;
+block(1).instruct.img(2).file = 'neutral_real.jpg';
+block(1).instruct.img(2).position = [2 -3]; 
+block(1).instruct.img(2).size = [3 3];
+block(1).instruct.img(2).rotation = 180;
 
 % block: low level features
 block(2).reportmode = 'key'; 
 block(2).trials = [10,11,12,13,14,15,16,17]; 
 block(2).randomizetrials = true; 
 block(2).repeattrials = 2; 
+block(2).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(2).instruction = ['Hold the left key to report emotional faces\n' ...
     'Hold the right key to report neutral faces \n Release keys if you are unsure.\n\nPress any key to start'];
+block(2).instruct.imgdo = false;
 
 %['You do not have to report anything. \n' ... 'Just pay attention. \n\nPress any key to start']; 
 
@@ -579,8 +592,11 @@ block(3).reportmode = 'key';
 block(3).trials = [18,19,20,21,22,23,24,25]; 
 block(3).randomizetrials = true; 
 block(3).repeattrials = 2; 
+block(3).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(3).instruction = ['Hold the left key to report emotional faces\n' ...
     'Hold the right key to report neutral faces \n Release keys if you are unsure.\n\nPress any key to start'];
+block(3).instruct.imgdo = false;
+
 %%
 
 % expt --

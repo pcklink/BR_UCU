@@ -65,10 +65,11 @@ try
     %% Hardware setup ------
     % Monitor --
     % Reduce PTB3 verbosity
-    oldLevel = Screen('Preference', 'Verbosity', 0); %#ok<*NASGU>
-    Screen('Preference', 'VisualDebuglevel', 0);
+    %oldLevel = Screen('Preference', 'Verbosity', 0); %#ok<*NASGU>
     Screen('Preference','SkipSyncTests',1);
-
+    oldVisualDebugLevel = Screen('Preference', 'VisualDebugLevel', 0);
+    oldSupressAllWarnings = Screen('Preference', 'SuppressAllWarnings', 1);
+    
     % Do some basic initializing
     PsychDefaultSetup(2); HideCursor;
     % ListenChar(2); % silence keyboard for matlab
@@ -79,7 +80,7 @@ try
     % for our setup the two monitors form one large screen
     % using stereomode later on then splits this into a left/right half
     % that you draw stimuli on independently
-
+    
     % Gamma Correction to allow intensity in fractions --
     % Each pixel can have an intensity values specified in 8 bits (0-255)
     % We have initialized PTB to use relative values 0-1 instead of bit values 0-255
@@ -96,7 +97,7 @@ try
     Screen('LoadNormalizedGammaTable',monitor.scr, Gamtable);
     % we save the uncorrected gamma-table and put it back at the end so the screen looks normal again
     % gamma correction depends on monitor settings: DO NOT CHANGE BRIGHTNESS OR CONTRAST
-
+    
     % Get the screen size in pixels
     [monitor.PixWidth, monitor.PixHeight] = ...
         Screen('WindowSize',monitor.scr);
@@ -122,7 +123,7 @@ try
         case 'CKNIN'
             WindowRect = [1920 0 1920+1500 750]; %#ok<*UNRCH> %debug
     end
-
+    
     % Open a window in this 'screen'
     PsychImaging('PrepareConfiguration'); % this allows structural handling of video like mirroring
     if monitor.fliphorizontal % if this is set 'true' in the settings
@@ -186,7 +187,7 @@ try
         wavedata = [y';y']; nrchannels = sound.play.nchan;
         PsychPortAudio('FillBuffer', hplay, wavedata); % load the sound into a buffer
     end
-
+    
     %% Prepare stimuli ------
     %% alignment stim --
     % the alignment stimuli are a set of 'bubbles' that are in the same location on both screens
@@ -446,10 +447,48 @@ try
         end
 
         %% instruction screen -
+        % if we want images do this
+        if isfield(block,'instruct') && ~isempty(block(B).instruct.imgdo) && block(B).instruct.imgdo
+            for ii = 1:length(block(B).instruct.img)
+                block(B).instruct.img(ii).pospix = ...
+                    block(B).instruct.img(ii).position.*monitor.Deg2Pix;
+                block(B).instruct.img(ii).sizepix = ...
+                    block(B).instruct.img(ii).size.*monitor.Deg2Pix;
+
+                % load image
+                block(B).instruct.img(ii).imgmat = imread(fullfile(RunPath,'images',...
+                     block(B).instruct.img(ii).file));
+                % make greyscale and single luminance values matrix
+                if size(block(B).instruct.img(ii).imgmat,3) == 3
+                    block(B).instruct.img(ii).imgmat = uint8(...
+                        mean(block(B).instruct.img(ii).imgmat,3));
+                end
+                % to texture
+                block(B).instruct.img(ii).imgtex = Screen('MakeTexture', ...
+                    monitor.w, block(B).instruct.img(ii).imgmat);
+            end
+        
+        end
+
         for fb = [0 1] % both framebuffers for stereomode
             Screen('SelectStereoDrawBuffer', monitor.w, fb);
             % BG
             Screen('FillRect', monitor.w, bg.color, []);
+
+            if isfield(block,'instruct') && ~isempty(block(B).instruct.imgdo) && block(B).instruct.imgdo
+               for ii = 1:length(block(B).instruct.img) 
+                   drect = [0 0 ...
+                       block(B).instruct.img(ii).sizepix(1) ...
+                       block(B).instruct.img(ii).sizepix(2)];
+                   drect = CenterRectOnPoint(drect,...
+                       monitor.center(1)-block(B).instruct.img(ii).pospix(1),...
+                       monitor.center(2)-block(B).instruct.img(ii).pospix(2));
+                   Screen('DrawTexture', monitor.w,...
+                       block(B).instruct.img(ii).imgtex,[],drect,...
+                       block(B).instruct.img(ii).rotation);
+               end
+            end
+
             % text
             DrawFormattedText(monitor.w,block(B).instruction, ...
                 'center','center',bg.textcolor);
@@ -1463,9 +1502,11 @@ try
     sca; ListenChar(); ShowCursor;
 catch
     %% Error handling
-    psychrethrow(psychlasterror);
     Screen('LoadNormalizedGammaTable', monitor.w, monitor.OLD_Gamtable);
+    Screen('Preference', 'VisualDebugLevel', oldVisualDebugLevel);
+    Screen('Preference', 'SuppressAllWarnings', oldSupressAllWarnings);
     sca; ListenChar(); ShowCursor;
+    psychrethrow(psychlasterror);
 end
 
 %% Repeating functions
