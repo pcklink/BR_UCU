@@ -495,6 +495,8 @@ try
         end
         Screen('DrawingFinished',monitor.w);
         vbl = Screen('Flip', monitor.w);
+        WaitSecs(3); % hardcode a 3 second wait periode so we cannot accidentally
+        % move on if a key is still being pressed
 
         log.ev = [log.ev; {vbl,'BlockStart',b}]; % log
         if eyetracker.do

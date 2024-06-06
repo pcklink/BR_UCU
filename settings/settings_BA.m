@@ -9,7 +9,7 @@ monitor.DebugMode = 'NoDebug'; %-> NoDebug during experiment 'CKHOME'
 % eyetracker ---
 eyetracker.do = true; 
 eyetracker.type = 'Tobii Pro Fusion'; 
-eyetracker.calibrate = false; 
+eyetracker.calibrate = true; 
 eyetracker.toolboxfld = '/home/chris/Documents/MATLAB/Titta'; 
 
 % sound ---
@@ -564,6 +564,7 @@ block(1).repeattrials = 2;
 block(1).randrepmode = 'randomrepeat'; % randomrepeat or repeatrandom
 block(1).instruction = ['Hold the left key to report emotional faces\n' ...
     'Hold the right key to report neutral faces \n Release keys if you are unsure.\n\nPress any key to start'];
+
 % here you can define image to show with the instructions
 block(1).instruct.imgdo = false;
 block(1).instruct.img(1).file = 'happy_real.jpg';
