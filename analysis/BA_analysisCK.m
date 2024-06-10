@@ -7,7 +7,7 @@ logflds = {...
     'ES','JBL','KvR','LdO','MA-block3','MA-block12','MB','MS',...
     'NS','NZ','OK','PJR-block13','SH','SvR'};
 
-FigType = 'png';
+FigType = 'fig';
 
 %% Load the data
 for f = 1:length(logflds)   
@@ -21,7 +21,7 @@ end
 cd(AnalysisFld)
 
 %% Process the data
-for d = 7:length(D)  % datasets
+for d = 1:length(D)  % datasets
     fprintf(['Data session ' num2str(d) '\n']);
     % - Demographic info (age, sex, left/right handed, participant ID) 
     SUBJECT = D(d).log.log.Subject;
@@ -211,10 +211,10 @@ for d = 7:length(D)  % datasets
 end
 
 %% Save the results
-[~,~] = mkdir('BA_epochs','data');
-for i=1:length(EPOCHS)
-    fprintf(['Saving session ' num2str(i) '\n']);
-    epochs = EPOCHS(i);
-    session = logflds{i};%folders(i).name;
-    save(fullfile('BA_epochs','data',['epochs_' session]),'epochs','session');
-end
+% [~,~] = mkdir('BA_epochs','data');
+% for i=1:length(EPOCHS)
+%     fprintf(['Saving session ' num2str(i) '\n']);
+%     epochs = EPOCHS(i);
+%     session = logflds{i};%folders(i).name;
+%     save(fullfile('BA_epochs','data',['epochs_' session]),'epochs','session');
+% end
