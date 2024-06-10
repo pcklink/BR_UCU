@@ -7,7 +7,7 @@ logflds = {...
     'ES','JBL','KvR','LdO','MA-block3','MA-block12','MB','MS',...
     'NS','NZ','OK','PJR-block13','SH','SvR'};
 
-FigType = 'fig';
+FigType = 'none';
 
 %% Load the data
 for f = 1:length(logflds)   
@@ -71,6 +71,7 @@ for d = 1:length(D)  % datasets
     eyeT2 = eyeT - dt;
 
     firstblocktrial = 1;
+    %%
     for b = 1:length(blockstarts) % blocks
         SessNr = d;
         SessFld = fullfile(fullfile(DataFld,logflds{d}));
@@ -83,6 +84,7 @@ for d = 1:length(D)  % datasets
         EPOCHS(d).Block(b).Type = BlockType;
 
         ttb=0;
+        %%
         for ti = 1:nTrials
             TrialNr = trialsthisblock(ti); 
             ttb = ttb+1;
@@ -111,8 +113,8 @@ for d = 1:length(D)  % datasets
                     diff(keyepochs(:,1)) keyepochs(1:end-1,2)];
             end
 
-            EPOCHS(d).Block(b).Trial(TrialNr).epochskey = keyepochs;
-            EPOCHS(d).Block(b).Trial(TrialNr).epochskey_hdr = ...
+            EPOCHS(d).Block(b).Trial(ti).epochskey = keyepochs;
+            EPOCHS(d).Block(b).Trial(ti).epochskey_hdr = ...
                 {'start(s)','dur(s)','percept'};
 
             % eye ----
@@ -137,7 +139,7 @@ for d = 1:length(D)  % datasets
                 span = (1*60)./(sdur*60);
                 span = 30;
 
-                xlowess = smooth(t,x,30,'loess');
+                xlowess = smooth(t,x,60,'loess');
                 v = (diff(xlowess))*60; % velocity in deg/s
                 sw = round(60/10); % smoothing window 100 ms
                 plot(t,xlowess,'r-','LineWidth',2)
@@ -197,13 +199,15 @@ for d = 1:length(D)  % datasets
                 end
                 close(f);
 
-                EPOCHS(d).Block(b).Trial(TrialNr).epochseye = eyeepochs;
-                EPOCHS(d).Block(b).Trial(TrialNr).epochseye_hdr = ...
+                EPOCHS(d).Block(b).Trial(ti).epochseye = eyeepochs;
+                EPOCHS(d).Block(b).Trial(ti).epochseye_hdr = ...
                     {'start(s)','dur(s)','mVal','Percept'};
+                EPOCHS(d).Block(b).Trial(ti).TrialType = TrialType;
             else
-                EPOCHS(d).Block(b).Trial(TrialNr).epochseye = [];
-                EPOCHS(d).Block(b).Trial(TrialNr).epochseye_hdr = ...
+                EPOCHS(d).Block(b).Trial(ti).epochseye = [];
+                EPOCHS(d).Block(b).Trial(ti).epochseye_hdr = ...
                     {'start(s)','dur(s)','mVal','Percept'};
+                EPOCHS(d).Block(b).Trial(ti).TrialType = TrialType;
             end
         end
         firstblocktrial = trialsthisblock(end)+1;
@@ -211,10 +215,11 @@ for d = 1:length(D)  % datasets
 end
 
 %% Save the results
-% [~,~] = mkdir('BA_epochs','data');
-% for i=1:length(EPOCHS)
-%     fprintf(['Saving session ' num2str(i) '\n']);
-%     epochs = EPOCHS(i);
-%     session = logflds{i};%folders(i).name;
-%     save(fullfile('BA_epochs','data',['epochs_' session]),'epochs','session');
-% end
+[~,~] = mkdir('BA_epochs','data');
+save(fullfile('BA_epochs','data','ALL_EPOCHS'),'EPOCHS','D');
+for i=1:length(EPOCHS)
+    fprintf(['Saving session ' num2str(i) '\n']);
+    epochs = EPOCHS(i);
+    session = logflds{i};%folders(i).name;
+    save(fullfile('BA_epochs','data',['epochs_' session]),'epochs','session');
+end
