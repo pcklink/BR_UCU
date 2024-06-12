@@ -3,9 +3,15 @@
 % load data
 load(fullfile('BA_epochs','data','ALL_EPOCHS'));
 
+%% fix participant 'MA'
+EPOCHS(6).Block(3) = EPOCHS(5).Block(1);
+EPOCHS(5:13) = EPOCHS(6:14);
+EPOCHS(14) = [];
+
 %% Collect data =====
 % Trialtypes to combine
 ttc = 2:9; % << I picked this pretty randomly
+% for non-continuous lists use something like [1,3,7,14,etc]
 
 OUTPUT = []; COLLECT = [];
 % loop over participants
@@ -34,6 +40,7 @@ for s=1:length(EPOCHS)
     tlr = COLLECT(COLLECT(:,1)==s,[4 5]);
     OUTPUT = [OUTPUT; s sum(tlr,1)];
 end
+fprintf('SUM OF EPOCHS LEFT/RIGHT PER PARTICIPANT\n')
 fprintf('SUBJECT -- LEFT -- RIGHT\n')
 OUTPUT
 
