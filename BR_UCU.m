@@ -116,6 +116,8 @@ try
     switch DebugMode
         case 'NoDebug'
             WindowRect = []; %fullscreen
+        case 'UU-SETUP'
+            WindowRect = []; %fullscreen
         case 'UU'
             WindowRect = [0 0 1200 600]; %#ok<*UNRCH> %debug
         case 'CKHOME'
@@ -495,7 +497,7 @@ try
         end
         Screen('DrawingFinished',monitor.w);
         vbl = Screen('Flip', monitor.w);
-        WaitSecs(3); % hardcode a 3 second wait periode so we cannot accidentally
+        WaitSecs(2); % hardcode a 2 second wait periode so we cannot accidentally
         % move on if a key is still being pressed
 
         log.ev = [log.ev; {vbl,'BlockStart',b}]; % log
